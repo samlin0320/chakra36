@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>身心靈檢測 — 36問脈輪共振</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root {
+    --bg: #0a0a14;
+    --surface: #14141f;
+    --card: #1c1c2b;
+    --accent: #c084fc;
+    --accent2: #f472b6;
+    --accent3: #60a5fa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #2d2d3f;
+    --danger: #f87171;
+    --ok: #34d399;
+
+    --c-root: #ef4444;
+    --c-sacral: #f97316;
+    --c-solar: #fbbf24;
+    --c-heart: #34d399;
+    --c-throat: #60a5fa;
+    --c-third: #818cf8;
+    --c-crown: #c084fc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; min-height: 100vh; line-height: 1.6; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── INTRO / LOGIN ── */
+  #intro {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px 24px; text-align: center;
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(192,132,252,0.18) 0%, transparent 70%);
+    position: relative; overflow: hidden;
+  }
+  .badge {
+    display: inline-block; padding: 4px 14px;
+    background: rgba(192,132,252,0.15);
+    border: 1px solid rgba(192,132,252,0.35);
+    border-radius: 999px; font-size: 12px; color: var(--accent);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px;
+  }
+  #intro h1 {
+    font-size: clamp(2rem, 6vw, 3.4rem); font-weight: 800;
+    background: linear-gradient(135deg, #e2e8f0 20%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 14px;
+  }
+  #intro .subtitle { font-size: 1.02rem; color: var(--muted); max-width: 560px; margin: 0 auto 28px; }
+  .intro-chips { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px; }
+  .chip { padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--border); color: var(--muted); }
+
+  .login-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; padding: 28px; max-width: 460px; width: 100%;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .login-card h3 { font-size: 1rem; color: var(--text); margin-bottom: 14px; }
+  .login-hint { font-size: 0.82rem; color: var(--muted); margin-bottom: 18px; line-height: 1.55; }
+  #gsi-btn-wrap { min-height: 44px; display: flex; justify-content: center; margin-bottom: 14px; }
+  .or-divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 0.78rem; margin: 14px 0; }
+  .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .guest-input {
+    width: 100%; padding: 12px 14px; background: var(--surface);
+    border: 1.5px solid var(--border); border-radius: 10px;
+    color: var(--text); font-size: 0.95rem; outline: none; margin-bottom: 10px;
+    font-family: inherit;
+  }
+  .guest-input:focus { border-color: var(--accent); }
+  .start-btn {
+    width: 100%; padding: 14px 24px; border-radius: 12px;
+    font-size: 1rem; font-weight: 700; cursor: pointer; border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; box-shadow: 0 6px 24px rgba(192,132,252,0.35);
+    transition: all 0.2s; font-family: inherit;
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(192,132,252,0.5); }
+  .start-btn.secondary { background: transparent; border: 1.5px solid var(--border); color: var(--muted); box-shadow: none; }
+  .start-btn.secondary:hover { color: var(--text); border-color: var(--accent); transform: none; }
+
+  /* ── APP HEADER ── */
+  .app-header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,10,20,0.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px; display: flex; align-items: center; gap: 14px;
+  }
+  .app-title { font-size: 0.95rem; font-weight: 700; color: var(--text); flex: 1; }
+  .user-pill {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 999px; font-size: 0.8rem; color: var(--muted);
+  }
+  .user-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+  .icon-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
+    font-family: inherit; transition: all 0.15s;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  /* ── APP LAYOUT ── */
+  #app {
+    display: grid; grid-template-columns: 320px 1fr;
+    max-width: 1280px; margin: 0 auto; padding: 24px 20px; gap: 24px;
+  }
+  @media (max-width: 900px) { #app { grid-template-columns: 1fr; } .chakra-panel { position: relative !important; top: auto !important; } }
+
+  /* ── CHAKRA PANEL ── */
+  .chakra-panel {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px;
+    position: sticky; top: 80px; height: fit-content;
+  }
+  .chakra-panel h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 14px; }
+  .chakra-list { display: flex; flex-direction: column-reverse; gap: 10px; }
+  .chakra-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 10px; border-radius: 10px;
+    background: var(--surface); border: 1px solid transparent;
+    transition: all 0.3s;
+  }
+  .chakra-row.active { border-color: currentColor; box-shadow: 0 0 18px -4px currentColor; }
+  .chakra-orb {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, currentColor, transparent 70%);
+    background-color: currentColor;
+    position: relative; flex-shrink: 0;
+    box-shadow: 0 0 12px currentColor;
+  }
+  .chakra-orb::before, .chakra-orb::after {
+    content: ''; position: absolute; inset: -4px;
+    border-radius: 50%; border: 1.5px solid currentColor;
+    opacity: 0.45;
+  }
+  .chakra-orb::after { inset: -8px; opacity: 0.2; border-style: dashed; }
+  .chakra-row.spinning .chakra-orb::before { animation: spin var(--spin, 4s) linear infinite; }
+  .chakra-row.spinning .chakra-orb::after { animation: spin var(--spin2, 7s) linear infinite reverse; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .chakra-meta { flex: 1; min-width: 0; }
+  .chakra-name { font-size: 0.85rem; font-weight: 600; color: var(--text); display: flex; justify-content: space-between; }
+  .chakra-name .pct { color: var(--muted); font-weight: 500; font-size: 0.78rem; }
+  .chakra-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+  .chakra-fill { height: 100%; background: currentColor; transition: width 0.5s ease; box-shadow: 0 0 8px currentColor; }
+
+  /* ── QUESTIONS ── */
+  .quiz-area { min-width: 0; }
+  .progress-bar-wrap { margin-bottom: 24px; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+  .progress-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width 0.4s; width: 0%; }
+
+  .question-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; padding: 28px; animation: fadeUp 0.35s ease both;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .q-chakra-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 12px; border-radius: 999px; font-size: 0.78rem;
+    font-weight: 600; margin-bottom: 14px;
+  }
+  .q-chakra-badge .mini-orb { width: 10px; height: 10px; border-radius: 50%; background: currentColor; box-shadow: 0 0 6px currentColor; }
+  .q-num { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; letter-spacing: 1px; }
+  .q-text { font-size: clamp(1.1rem, 2.5vw, 1.3rem); font-weight: 700; line-height: 1.5; margin-bottom: 8px; }
+  .q-hint { font-size: 0.82rem; color: var(--muted); margin-bottom: 22px; }
+
+  .field-grid { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+  .field {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; transition: border-color 0.2s;
+  }
+  .field:focus-within { border-color: var(--accent); }
+  .field.valid { border-color: var(--ok); }
+  .field-label {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.82rem; font-weight: 600; color: var(--accent);
+    margin-bottom: 8px; letter-spacing: 0.5px;
+  }
+  .field-counter { font-size: 0.72rem; font-weight: 500; color: var(--muted); }
+  .field-counter.ok { color: var(--ok); }
+  .field-input {
+    width: 100%; background: transparent; border: none;
+    color: var(--text); font-size: 0.95rem; resize: vertical;
+    min-height: 64px; outline: none; font-family: inherit; line-height: 1.55;
+  }
+  .field-input::placeholder { color: rgba(148,163,184,0.55); }
+
+  .q-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 4px; gap: 12px; flex-wrap: wrap;
+  }
+  .q-foot-meta { font-size: 0.8rem; color: var(--muted); }
+  .q-foot-meta strong { color: var(--text); }
+  .q-nav { display: flex; gap: 10px; }
+  .nav-btn {
+    padding: 11px 22px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--border); color: var(--muted);
+    background: transparent; transition: all 0.2s; font-family: inherit;
+  }
+  .nav-btn:hover:not(:disabled) { border-color: var(--text); color: var(--text); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .nav-btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent; color: #fff;
+    box-shadow: 0 4px 14px rgba(192,132,252,0.3);
+  }
+  .nav-btn.primary:hover:not(:disabled) { transform: translateY(-1px); }
+
+  /* ── RESULT ── */
+  #result { padding: 24px 20px 60px; max-width: 900px; margin: 0 auto; }
+  .result-hero {
+    background: linear-gradient(135deg, rgba(192,132,252,0.12), rgba(244,114,182,0.08));
+    border: 1px solid rgba(192,132,252,0.3);
+    border-radius: 20px; padding: 36px; text-align: center; margin-bottom: 28px;
+  }
+  .result-hero h2 {
+    font-size: clamp(1.6rem, 4vw, 2.2rem); margin-bottom: 10px;
+    background: linear-gradient(135deg, #e2e8f0, var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .result-hero p { color: var(--muted); }
+
+  .chakra-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin-bottom: 28px;
+  }
+  .chakra-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; position: relative; overflow: hidden;
+  }
+  .chakra-card::before {
+    content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px;
+    background: radial-gradient(circle, currentColor, transparent 70%);
+    opacity: 0.15; filter: blur(10px);
+  }
+  .chakra-card-name { font-size: 0.95rem; font-weight: 700; color: currentColor; margin-bottom: 4px; }
+  .chakra-card-cn { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
+  .chakra-card-pct { font-size: 1.6rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+  .chakra-card-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+  .chakra-card-bar-fill { height: 100%; background: currentColor; box-shadow: 0 0 6px currentColor; }
+  .chakra-card-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+  .answers-block {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px; margin-bottom: 20px;
+  }
+  .answers-block h3 { font-size: 1rem; margin-bottom: 14px; color: var(--text); }
+  .answer-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .answer-item:last-child { border-bottom: none; }
+  .answer-q { font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 6px; }
+  .answer-field { font-size: 0.85rem; color: var(--text); margin: 4px 0; padding-left: 12px; border-left: 2px solid var(--border); }
+  .answer-field b { color: var(--accent); margin-right: 6px; font-weight: 600; }
+
+  .result-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .result-actions .nav-btn { padding: 12px 24px; }
+
+  /* ── SHARE / EXPORT ── */
+  .share-block {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px; margin-bottom: 20px;
+  }
+  .share-block h3 { font-size: 1rem; margin-bottom: 14px; color: var(--text); }
+  .share-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .share-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all 0.2s;
+    text-decoration: none;
+  }
+  .share-btn:hover { border-color: currentColor; transform: translateY(-2px); box-shadow: 0 6px 18px -6px currentColor; }
+  .share-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: currentColor; color: #fff; font-size: 0.78rem; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .share-btn .share-icon svg { width: 16px; height: 16px; }
+  .share-btn span.txt { flex: 1; color: var(--text); }
+  .share-btn[data-platform="md"]      { color: #94a3b8; }
+  .share-btn[data-platform="pdf"]     { color: #f87171; }
+  .share-btn[data-platform="json"]    { color: #c084fc; }
+  .share-btn[data-platform="email"]   { color: #60a5fa; }
+  .share-btn[data-platform="telegram"]{ color: #29b6f6; }
+  .share-btn[data-platform="line"]    { color: #06c755; }
+  .share-btn[data-platform="whatsapp"]{ color: #25d366; }
+  .share-btn[data-platform="imessage"]{ color: #34d399; }
+  .share-btn[data-platform="copy"]    { color: #fbbf24; }
+
+  /* ── CHANNEL FOOTER / HEADER LINK ── */
+  .channel-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px;
+    background: rgba(41,182,246,0.12);
+    border: 1px solid rgba(41,182,246,0.4);
+    color: #29b6f6; text-decoration: none;
+    font-size: 0.78rem; font-weight: 600; transition: all 0.15s;
+  }
+  .channel-link:hover { background: rgba(41,182,246,0.2); transform: translateY(-1px); }
+  .site-footer {
+    text-align: center; padding: 28px 16px 18px; color: var(--muted);
+    font-size: 0.82rem; line-height: 1.7;
+  }
+  .site-footer a { color: var(--accent); text-decoration: none; }
+  .site-footer a:hover { text-decoration: underline; }
+
+  /* ── CHANNEL POSTS ── */
+  #channel {
+    min-height: 100vh; padding: 40px 20px 80px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .ch-hero {
+    text-align: center; margin-bottom: 36px;
+    padding: 36px 24px; border-radius: 20px;
+    background: linear-gradient(135deg, rgba(41,182,246,0.12), rgba(192,132,252,0.08));
+    border: 1px solid rgba(41,182,246,0.3);
+  }
+  .ch-hero h2 {
+    font-size: clamp(1.6rem, 4vw, 2.2rem); margin-bottom: 8px;
+    background: linear-gradient(135deg, #29b6f6, var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .ch-hero p { color: var(--muted); font-size: 0.95rem; }
+  .ch-hero .channel-link { margin-top: 14px; }
+  .ch-cat-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 22px; justify-content: center;
+  }
+  .ch-tab {
+    padding: 7px 16px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--card);
+    color: var(--muted); font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+  }
+  .ch-tab.active { color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-color: transparent; }
+  .ch-tab:hover { color: var(--text); }
+  .ch-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .ch-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px; cursor: pointer;
+    transition: all 0.2s; text-decoration: none; color: inherit;
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+  }
+  .ch-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent-c, var(--accent));
+    transform: scaleX(0); transform-origin: left; transition: transform 0.3s;
+  }
+  .ch-card:hover { border-color: var(--accent-c, var(--accent)); transform: translateY(-3px); box-shadow: 0 12px 28px -10px var(--accent-c, var(--accent)); }
+  .ch-card:hover::before { transform: scaleX(1); }
+  .ch-meta {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.72rem; color: var(--muted); margin-bottom: 10px;
+  }
+  .ch-meta .ch-cat-pill {
+    padding: 2px 8px; border-radius: 999px;
+    background: var(--accent-c-bg, rgba(192,132,252,0.15));
+    color: var(--accent-c, var(--accent)); font-weight: 700;
+    font-size: 0.7rem; letter-spacing: 0.5px;
+  }
+  .ch-card h4 { font-size: 1.02rem; font-weight: 700; line-height: 1.4; margin-bottom: 8px; color: var(--text); }
+  .ch-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.55; flex: 1; }
+  .ch-card-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 12px; font-size: 0.78rem;
+  }
+  .ch-card-foot .read { color: var(--accent-c, var(--accent)); font-weight: 600; }
+  .ch-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; margin-bottom: 18px;
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.85rem;
+  }
+  .ch-back:hover { color: var(--text); border-color: var(--accent); }
+
+  /* ── PRINT (PDF) ── */
+  @media print {
+    body { background: #fff !important; color: #111 !important; }
+    .app-header, .chakra-panel, #intro, #app-screen, .progress-bar-wrap,
+    .result-actions, .share-block, .site-footer, .toast { display: none !important; }
+    #result.screen { display: block !important; }
+    .result-hero, .answers-block, .chakra-card {
+      background: #fff !important; border: 1px solid #ddd !important; color: #111 !important;
+      page-break-inside: avoid;
+    }
+    .result-hero h2, .chakra-card-pct, .answer-q, .answer-field, .answer-field b,
+    .chakra-card-name, .chakra-card-cn, .chakra-card-desc, .answers-block h3 {
+      color: #111 !important; -webkit-text-fill-color: #111 !important; background: none !important;
+    }
+    .answer-field { border-left: 2px solid #999 !important; }
+    .chakra-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; }
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--card); border: 1px solid var(--accent); color: var(--text);
+    padding: 12px 20px; border-radius: 10px; font-size: 0.88rem;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.4); z-index: 1000; opacity: 0;
+    transition: all 0.3s;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ════════════ INTRO / LOGIN ════════════ -->
+<section id="intro" class="screen active">
+  <div class="badge">CHAKRA × 36 QUESTIONS</div>
+  <h1>身心靈檢測 · 36問脈輪共振</h1>
+  <p class="subtitle">
+    心理學家亞瑟·阿倫的36問，搭配 5W1H 深度展開。<br>
+    每一題的回答，將共振對應的脈輪——讓你看見自己內在能量的流動。
+  </p>
+  <div class="intro-chips">
+    <span class="chip">7 脈輪</span>
+    <span class="chip">36 提問</span>
+    <span class="chip">5W1H 深掘</span>
+    <span class="chip">每欄 13 字以上</span>
+  </div>
+  <a class="channel-link" href="https://t.me/sam00may" target="_blank" rel="noopener" style="margin-bottom:14px;">
+    📡 加入頻道 · t.me/sam00may
+  </a>
+  <button class="start-btn secondary" id="btn-view-channel" style="margin-top:8px;max-width:320px;">
+    📚 瀏覽頻道精選文章 →
+  </button>
+
+  <div class="login-card">
+    <h3>開始之前 · 登入紀錄</h3>
+    <p class="login-hint">使用 Gmail 登入後，答案會以你的 email 為索引保存在本機（localStorage），方便日後回顧或繼續。</p>
+    <div id="gsi-btn-wrap"></div>
+    <div id="gsi-warn" style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;display:none;">
+      ⚠️ 尚未設定 Google Client ID，請使用訪客模式
+    </div>
+    <div id="origin-debug" style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;padding:8px 10px;background:var(--surface);border:1px dashed var(--border);border-radius:8px;font-family:'Courier New',monospace;text-align:left;line-height:1.5;"></div>
+    <div class="or-divider">或</div>
+    <input id="guest-email" class="guest-input" type="email" placeholder="輸入 email（訪客模式）">
+    <input id="guest-name" class="guest-input" type="text" placeholder="暱稱（選填）">
+    <button class="start-btn" id="guest-start">以訪客身份開始</button>
+  </div>
+</section>
+
+<!-- ════════════ CHANNEL POSTS ════════════ -->
+<section id="channel" class="screen">
+  <button class="ch-back" id="btn-channel-back">← 返回</button>
+  <div class="ch-hero">
+    <div class="badge">CHANNEL · t.me/sam00may</div>
+    <h2>📡 身、心、靈平衡 · 頻道精選文章</h2>
+    <p>由 sam00may 整理發佈，72 訂閱者　·　涵蓋靈性、健康、AI 工具三大主題</p>
+    <a class="channel-link" href="https://t.me/sam00may" target="_blank" rel="noopener">前往原頻道訂閱 →</a>
+  </div>
+  <div class="ch-cat-tabs" id="ch-tabs"></div>
+  <div class="ch-grid" id="ch-grid"></div>
+  <footer class="site-footer" style="margin-top:40px;">
+    所有文章原始貼文於 <a href="https://t.me/sam00may" target="_blank">t.me/sam00may</a>
+  </footer>
+</section>
+
+<!-- ════════════ MAIN APP ════════════ -->
+<section id="app-screen" class="screen">
+  <header class="app-header">
+    <span class="app-title">身心靈檢測 · 36問</span>
+    <a class="channel-link" href="https://t.me/sam00may" target="_blank" rel="noopener">📡 t.me/sam00may</a>
+    <span class="user-pill"><span class="dot"></span><span id="user-label">—</span></span>
+    <button class="icon-btn" id="btn-logout">登出</button>
+  </header>
+
+  <main id="app">
+    <!-- Chakra panel -->
+    <aside class="chakra-panel">
+      <h4>脈輪共振 · 即時</h4>
+      <div class="chakra-list" id="chakra-list"></div>
+      <div style="margin-top:14px;font-size:0.72rem;color:var(--muted);line-height:1.5;">
+        每題回答 1 個欄位 → 慢轉<br>
+        回答 2+ 欄位 → 快轉（共振增強）
+      </div>
+    </aside>
+
+    <!-- Quiz area -->
+    <section class="quiz-area">
+      <div class="progress-bar-wrap">
+        <div class="progress-meta">
+          <span id="progress-text">第 1 / 36 題</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+
+      <div id="question-host"></div>
+    </section>
+  </main>
+</section>
+
+<!-- ════════════ RESULT ════════════ -->
+<section id="result" class="screen">
+  <div class="result-hero">
+    <h2 id="result-title">36問完成 · 你的脈輪能量圖譜</h2>
+    <p id="result-sub">以下是你 7 脈輪的共振強度。</p>
+  </div>
+  <div class="chakra-grid" id="chakra-grid"></div>
+  <div class="answers-block">
+    <h3>📜 你的 36 題回答</h3>
+    <div id="answers-list"></div>
+  </div>
+
+  <div class="share-block">
+    <h3>💾 儲存 / 分享</h3>
+    <div class="share-grid">
+      <button class="share-btn" data-platform="md" id="btn-md"><span class="share-icon">MD</span><span class="txt">Markdown 檔</span></button>
+      <button class="share-btn" data-platform="pdf" id="btn-pdf"><span class="share-icon">PDF</span><span class="txt">列印 / 存 PDF</span></button>
+      <button class="share-btn" data-platform="json" id="btn-json"><span class="share-icon">{}</span><span class="txt">JSON 備份</span></button>
+      <button class="share-btn" data-platform="copy" id="btn-copy"><span class="share-icon">📋</span><span class="txt">複製到剪貼簿</span></button>
+      <a class="share-btn" data-platform="email" id="btn-email" target="_blank"><span class="share-icon">@</span><span class="txt">Email</span></a>
+      <a class="share-btn" data-platform="telegram" id="btn-tg" target="_blank"><span class="share-icon">TG</span><span class="txt">Telegram</span></a>
+      <a class="share-btn" data-platform="line" id="btn-line" target="_blank"><span class="share-icon">L</span><span class="txt">LINE</span></a>
+      <a class="share-btn" data-platform="whatsapp" id="btn-wa" target="_blank"><span class="share-icon">W</span><span class="txt">WhatsApp</span></a>
+      <a class="share-btn" data-platform="imessage" id="btn-im" target="_blank"><span class="share-icon">iM</span><span class="txt">iMessage / SMS</span></a>
+    </div>
+    <div style="margin-top:14px;font-size:0.78rem;color:var(--muted);line-height:1.6;">
+      📡 全部內容由 <a href="https://t.me/sam00may" target="_blank" style="color:#29b6f6;">t.me/sam00may</a> 製作分享 · 分享時會自動附上頻道連結
+    </div>
+  </div>
+
+  <div class="result-actions">
+    <button class="nav-btn primary" id="btn-restart">重新作答</button>
+    <button class="nav-btn" id="btn-back-app">回到測驗</button>
+  </div>
+
+  <footer class="site-footer">
+    身心靈檢測 · 36問脈輪共振　·　© <span id="year"></span><br>
+    📡 訂閱頻道取得更多測驗：<a href="https://t.me/sam00may" target="_blank">t.me/sam00may</a>
+  </footer>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   CONFIG — 想接 Google Sign-In 請填入你的 OAuth Client ID
+   建立步驟：https://console.cloud.google.com/apis/credentials
+   →「Create Credentials → OAuth client ID → Web application」
+   → Authorized JS origins 加入：
+        http://localhost  以及  file://  以及  你的網址
+   ══════════════════════════════════════════════════════════════ */
+const GOOGLE_CLIENT_ID = "527208434591-85l5bgsuas2id7nkle8qrjeh5a8d4gbb.apps.googleusercontent.com";
+
+/* ── 頻道精選文章（資料來自 t.me/sam00may） ── */
+const CHANNEL_POSTS = [
+  { id:67, cat:'spirit',  title:'8月8日獅子門戶全解析',          excerpt:'解析 Lion\'s Gate 能量、DNA 啟動、天狼星對位帶來的靈性揚升。' },
+  { id:69, cat:'spirit',  title:'農曆七月「鬼月」謊言真相',       excerpt:'考究農曆七月被污名化的源頭——明朝朱元璋與背後負面外星勢力的操作。' },
+  { id:84, cat:'spirit',  title:'2026 占星預測：黃金與白銀',      excerpt:'西方占星與印度吠陀占星的交會點預示全球轉型，6/30 前防禦性資產配置建議。' },
+  { id:85, cat:'spirit',  title:'占星骰子（Astrology Dice）',     excerpt:'三顆骰子代表行星、星座、宮位——快速取得當下宇宙訊息的工具。' },
+  { id:77, cat:'spirit',  title:'李嗣涔博士｜氣、撓場、同類療法',  excerpt:'中醫「氣」與道家「炁」的差異、撓場理論、順勢療法的「X 訊息場」機制。' },
+
+  { id:66, cat:'health',  title:'22 歲後必學的三件事 ft. 大人學',  excerpt:'職涯選擇、賺錢能力、人際關係——成年後最關鍵的三項生存技能。' },
+  { id:70, cat:'health',  title:'阿茲海默症預防｜曾醫師三大超食物', excerpt:'雞蛋、咖啡、綠茶；MIND 飲食法降低 53% 失智風險，五大危險因子。' },
+  { id:71, cat:'health',  title:'黴菌毒素全攻略',                  excerpt:'環境排毒、徽菌毒素中毒症狀（疲倦、認知功能異常）的辨識與對策。' },
+  { id:73, cat:'health',  title:'習慣養成的科學三原則',            excerpt:'行動先於動機、習慣堆疊（Habit Stacking）、環境推力——讓改變變簡單。' },
+  { id:76, cat:'health',  title:'帕金森氏症｜不只是手抖',          excerpt:'黑質退化導致多巴胺不足；早期非顫抖型徵兆，及早介入的關鍵。' },
+
+  { id:68, cat:'ai',      title:'NotebookLM 教學｜把 YT 變 Podcast', excerpt:'Google AI 工具：把 YouTube 影片轉成雙人對談 Podcast，組織研究資料。' },
+  { id:72, cat:'ai',      title:'Google Gemini 3 · 15 種免費應用',  excerpt:'內容創作、網頁開發、即時導引——Gemini 3 的 15 個免費功能完整盤點。' },
+  { id:74, cat:'ai',      title:'訂閱省錢攻略｜Perplexity & Monica', excerpt:'PayPal 領取免費 Perplexity Pro 一年；Monica AI 取代 ChatGPT 省 NT$3,200。' },
+  { id:75, cat:'ai',      title:'免費申請 Google Gemini Pro',       excerpt:'虛擬信用卡解法、驗證關卡破解，零成本啟用 Gemini Pro。' },
+  { id:81, cat:'ai',      title:'Google AI 免費技巧大全',          excerpt:'Deep Research、Canvas 資料視覺化、Nano Banana 圖像角色一致性。' },
+  { id:82, cat:'ai',      title:'Google AI 18 招｜Build & NotebookLM', excerpt:'用 Build 功能開發 App，用 NotebookLM 把文章變 Podcast 的完整流程。' },
+  { id:78, cat:'ai',      title:'十大下載工具比較',                 excerpt:'IDM、NDM、FDM、qBittorrent——多協定下載工具的功能比較表。' },
+  { id:80, cat:'ai',      title:'Aria2 系列下載器教學',             excerpt:'Motrix、uGet、Transmission 跨平台下載管理器，搭配 Aria2 的設定。' },
+  { id:79, cat:'ai',      title:'Gmail 帳號名稱可以改了',           excerpt:'Google 開放每年一次帳號變更，一生最多三次——使用條件與注意事項。' },
+  { id:86, cat:'ai',      title:'Typeless 語音輸入｜AI 自動清理',   excerpt:'AI 語音轉文字自動移除贅字，支援即時翻譯、自訂辭典。' },
+];
+
+const CHANNEL_CATS = [
+  { key:'all',    label:'全部',     emoji:'📚', color:'#c084fc' },
+  { key:'spirit', label:'靈性／占星', emoji:'🔮', color:'#818cf8' },
+  { key:'health', label:'身心健康',   emoji:'🌿', color:'#34d399' },
+  { key:'ai',     label:'AI 工具',    emoji:'🤖', color:'#60a5fa' },
+];
+
+/* ── 7 脈輪 ── */
+const CHAKRAS = {
+  root:   { en: 'Root',         cn: '海底輪',     color: 'var(--c-root)',   theme: '#ef4444', desc: '安全感、家庭、生存基礎' },
+  sacral: { en: 'Sacral',       cn: '臍輪',       color: 'var(--c-sacral)', theme: '#f97316', desc: '慾望、夢想、創造力' },
+  solar:  { en: 'Solar Plexus', cn: '太陽神經叢', color: 'var(--c-solar)',  theme: '#fbbf24', desc: '自信、成就、自我意志' },
+  heart:  { en: 'Heart',        cn: '心輪',       color: 'var(--c-heart)',  theme: '#34d399', desc: '愛、友情、慈悲' },
+  throat: { en: 'Throat',       cn: '喉輪',       color: 'var(--c-throat)', theme: '#60a5fa', desc: '表達、溝通、真實' },
+  third:  { en: 'Third Eye',    cn: '眉心輪',     color: 'var(--c-third)',  theme: '#818cf8', desc: '直覺、洞察、想像' },
+  crown:  { en: 'Crown',        cn: '頂輪',       color: 'var(--c-crown)',  theme: '#c084fc', desc: '靈性、連結、超越' }
+};
+const CHAKRA_ORDER = ['root', 'sacral', 'solar', 'heart', 'throat', 'third', 'crown'];
+
+/* ── 36 題 + 5W1H 子欄位 + 對應脈輪 ── */
+const QUESTIONS = [
+  { n:1,  chakra:'crown',  text:'如果你能在全世界任選一個人和你共進晚餐，他/她/祂 一定會赴約，你會選誰？', hint:'who? why?', fields:[ ['WHO','你會選誰？'], ['WHY','為什麼是這個人？'] ] },
+  { n:2,  chakra:'throat', text:'你想出名嗎？你希望以什麼樣的方式成名？', hint:'when? how? what?', fields:[ ['想不想','說明你想或不想成名'], ['WHY','為什麼想/不想'], ['HOW','以什麼方式成名'] ] },
+  { n:3,  chakra:'throat', text:'打電話之前你會先排練一下要說什麼嗎？為什麼？', fields:[ ['會不會','會或不會的具體情況'], ['WHY','為什麼會/不會'] ] },
+  { n:4,  chakra:'third',  text:'對你來說，「完美」的一天是什麼樣的？', hint:'what? why?', fields:[ ['WHAT','完美一天的樣子'], ['WHY','為什麼這樣是完美'] ] },
+  { n:5,  chakra:'throat', text:'上一次一個人唱歌是什麼時候？和別人一起唱又是什麼時候？', hint:'who? when? where? how?', fields:[ ['一個人 WHEN','一個人唱歌的時間/情境'], ['一起唱 WHEN','和別人一起唱的時間/情境'] ] },
+  { n:6,  chakra:'root',   text:'活到90歲，最後60年想保持30歲的身體狀態還是心理狀態？只能選一個。', hint:'why?', fields:[ ['身體狀態','選身體狀態的想法'], ['心理狀態','選心理狀態的想法'], ['WHY','為什麼最終這樣選'] ] },
+  { n:7,  chakra:'crown',  text:'你內心能預感自己何時會離世嗎？想活到幾歲？', hint:'how? why?', fields:[ ['HOW OLD','你想活到幾歲'], ['WHY','為什麼是這個歲數'] ] },
+  { n:8,  chakra:'heart',  text:'列出 3 個你和對方（未來伴侶）在外表上的共同特徵。', fields:[ ['特徵 1','第一個共同特徵'], ['特徵 2','第二個共同特徵'], ['特徵 3','第三個共同特徵'] ] },
+  { n:9,  chakra:'heart',  text:'生命中什麼事情讓你感激不盡？', hint:'what? when? where?', fields:[ ['WHAT','你最感激的事'], ['WHY','為什麼讓你感激'] ] },
+  { n:10, chakra:'sacral', text:'如果你可以改變自己的成長軌跡，你希望改成什麼樣子？', hint:'when? how? what?', fields:[ ['WHEN/WHAT','想改變的階段或樣子'], ['WHY','為什麼想這樣改'] ] },
+  { n:11, chakra:'third',  text:'用四個字／或一句話簡單形容你的生活故事。', hint:'what? how? why?', fields:[ ['描述','一句話／四字'], ['WHY','為什麼這麼形容'] ] },
+  { n:12, chakra:'solar',  text:'明天醒來能多一個技能或能力，你希望是什麼？為什麼？', fields:[ ['WHAT','想要的能力'], ['WHY','為什麼想要它'] ] },
+  { n:13, chakra:'third',  text:'有一個水晶球能告訴你關於人生的所有事，你最想知道過去還是未來的什麼？', fields:[ ['過去或未來','想知道什麼'], ['WHY','為什麼想知道'] ] },
+  { n:14, chakra:'sacral', text:'你有沒有一直夢想要做的事情？為什麼沒有做？', hint:'when? what? where?', fields:[ ['WHAT','夢想的事情'], ['WHY','為什麼還沒做'] ] },
+  { n:15, chakra:'solar',  text:'你人生中最大的成就是什麼？', hint:'what? when? where?', fields:[ ['WHAT','最大的成就'], ['WHY','為什麼這對你最重要'] ] },
+  { n:16, chakra:'heart',  text:'一段友誼中，你最重視的是什麼？', hint:'what? why? when? where? who?', fields:[ ['WHAT','你最重視的事'], ['WHY','為什麼重視它'] ] },
+  { n:17, chakra:'heart',  text:'你記憶中最珍貴（美好）的事情是什麼？', hint:'what? why? where? who?', fields:[ ['WHAT','最珍貴的回憶'] ] },
+  { n:18, chakra:'root',   text:'你記憶中最可怕（糟糕）的事情是什麼？', hint:'what? why? where? who?', fields:[ ['WHAT','最糟糕的回憶'] ] },
+  { n:19, chakra:'root',   text:'若一年後你會突然離世，你會改變現在的生活方式嗎？為什麼？', fields:[ ['會不會','會或不會的選擇'], ['WHY','為什麼這樣選'] ] },
+  { n:20, chakra:'heart',  text:'朋友對你來說意味著什麼？', hint:'what? why? where? who?', fields:[ ['描述','朋友的意義'], ['WHY','為什麼這樣理解'] ] },
+  { n:21, chakra:'heart',  text:'戀愛和感情在你的生活中扮演什麼角色？', fields:[ ['戀愛-描述','戀愛的角色'], ['戀愛-WHY','為什麼是這樣'], ['感情-描述','感情的角色'], ['感情-WHY','為什麼是這樣'] ] },
+  { n:22, chakra:'heart',  text:'你覺得你伴侶應該有的正面特質，請依序列出 5 個。', fields:[ ['特質 1','第一順位特質'], ['特質 2','第二順位特質'], ['特質 3','第三順位特質'], ['特質 4','第四順位特質'], ['特質 5','第五順位特質'] ] },
+  { n:23, chakra:'root',   text:'你的家庭成員彼此親密嗎？氛圍溫馨嗎？童年比大部分人都開心嗎？', fields:[ ['親密程度','親密程度描述'], ['氣氛','家庭氛圍描述'], ['童年','童年快樂程度'], ['WHY','整體原因'] ] },
+  { n:24, chakra:'root',   text:'你和母親的關係如何？', hint:'what? why? where? who? how?', fields:[ ['HOW','關係的樣貌'], ['WHY','為什麼是這樣'] ] },
+  { n:25, chakra:'third',  text:'用「我們」組 3 個基於現有場景的句子。', fields:[ ['句子 1','我們在這個房間都感覺…'], ['句子 2','我們在這個房間都感覺…'], ['句子 3','我們在這個房間都感覺…'] ] },
+  { n:26, chakra:'heart',  text:'把這個句子補完：「我希望有個人能跟我分享……」', fields:[ ['補充','你希望分享的內容'] ] },
+  { n:27, chakra:'throat', text:'若你想和對方成為親密朋友，列舉對他/她一定要知道的事。', fields:[ ['WHAT','一定要知道的事'], ['WHY','為什麼這件事重要'] ] },
+  { n:28, chakra:'heart',  text:'告訴對方你最喜歡他/她哪一點，據實回答，不說客套話。', fields:[ ['WHAT','最喜歡的那一點'], ['WHY','為什麼喜歡這一點'] ] },
+  { n:29, chakra:'sacral', text:'分享人生中最尷尬的時刻。', fields:[ ['WHEN','發生時間'], ['WHAT/WHY','發生什麼事 + 為什麼尷尬'], ['WHERE','發生地點'] ] },
+  { n:30, chakra:'sacral', text:'上一次你在他人面前哭是什麼時候？及自己哭是何時？因為何事？', fields:[ ['WHEN','時間'], ['WHY','原因'], ['WHO','在誰面前 / 誰相關'] ] },
+  { n:31, chakra:'heart',  text:'你會喜歡未來另一半身上有什麼特質？', fields:[ ['WHAT','你想要的特質'], ['WHY','為什麼是這個'] ] },
+  { n:32, chakra:'solar',  text:'有沒有什麼事情是你認為非常嚴肅，不能開玩笑的？', fields:[ ['WHAT','那件事是什麼'], ['WHY','為什麼不能開玩笑'] ] },
+  { n:33, chakra:'throat', text:'若你今晚會離世，最後悔沒有對誰吐露心聲？為什麼到現在還沒說？', fields:[ ['WHO','那個人是誰'], ['WHY','為什麼沒說 / 想說什麼'] ] },
+  { n:34, chakra:'sacral', text:'房子失火，親人寵物已救出。最後能再救一件物品，你選什麼？為什麼？', fields:[ ['物品','你會救什麼'], ['WHY','為什麼是這個'] ] },
+  { n:35, chakra:'root',   text:'若有家庭成員去世，誰的離開最讓你恐慌？為什麼？', fields:[ ['WHO','那個人是誰'], ['WHY','為什麼最讓你恐慌'] ] },
+  { n:36, chakra:'crown',  text:'說出一件你的個人問題，問對方該如何解決；也讓對方告訴你他眼中你的感受。', fields:[ ['WHAT','你的問題是什麼'], ['HOW','希望對方如何給回饋'] ] }
+];
+
+const MIN_CHARS = 13;
+const STORE_PREFIX = 'chakra36::';
+
+/* ══════════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════════ */
+const state = {
+  user: null,         // { email, name, provider }
+  index: 0,           // current question
+  answers: {},        // { [qNum]: { [fieldKey]: text } }
+};
+
+/* ══════════════════════════════════════════════════════════════
+   STORAGE
+   ══════════════════════════════════════════════════════════════ */
+const storeKey = () => STORE_PREFIX + (state.user?.email || 'guest');
+function save() {
+  if (!state.user) return;
+  localStorage.setItem(storeKey(), JSON.stringify({ user: state.user, index: state.index, answers: state.answers, ts: Date.now() }));
+}
+function load() {
+  if (!state.user) return false;
+  const raw = localStorage.getItem(storeKey());
+  if (!raw) return false;
+  try {
+    const data = JSON.parse(raw);
+    state.index = data.index || 0;
+    state.answers = data.answers || {};
+    return true;
+  } catch { return false; }
+}
+function clearStore() { if (state.user) localStorage.removeItem(storeKey()); }
+
+/* ══════════════════════════════════════════════════════════════
+   SCREENS
+   ══════════════════════════════════════════════════════════════ */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   AUTH — Google Identity Services + 訪客模式
+   ══════════════════════════════════════════════════════════════ */
+function decodeJwt(token) {
+  const base = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(decodeURIComponent(atob(base).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
+function setupGoogleAuth() {
+  const wrap = document.getElementById('gsi-btn-wrap');
+  const warn = document.getElementById('gsi-warn');
+  const dbg  = document.getElementById('origin-debug');
+
+  const origin = window.location.origin;
+  const proto  = window.location.protocol;
+  const isFile = proto === 'file:';
+  const isHttp = proto === 'http:' || proto === 'https:';
+  if (dbg) {
+    if (isFile) {
+      dbg.innerHTML = `❌ <b style="color:#f87171;">file:// 不支援 Google 登入</b><br>請改用：<a href="http://localhost:8080/chakra-36.html" style="color:#60a5fa;">http://localhost:8080/chakra-36.html</a>`;
+    } else if (isHttp) {
+      dbg.innerHTML = `🌐 目前 origin：<b style="color:#34d399;">${origin}</b><br>此 origin 必須登記在 Google Cloud Console 才能登入。`;
+    }
+  }
+  if (isFile) { wrap.style.display = 'none'; return; }
+
+  if (!GOOGLE_CLIENT_ID) { wrap.style.display = 'none'; warn.style.display = 'block'; return; }
+  const init = () => {
+    if (!window.google?.accounts?.id) { setTimeout(init, 200); return; }
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: resp => {
+        const profile = decodeJwt(resp.credential);
+        loginAs({ email: profile.email, name: profile.name || profile.email.split('@')[0], provider: 'google' });
+      }
+    });
+    google.accounts.id.renderButton(wrap, { theme: 'filled_black', size: 'large', text: 'signin_with', shape: 'pill', width: 320 });
+  };
+  init();
+}
+function loginAs(user) {
+  state.user = user;
+  load();
+  document.getElementById('user-label').textContent = user.name + ' · ' + user.email;
+  show('app-screen');
+  if (state.index >= QUESTIONS.length) { renderResult(); show('result'); return; }
+  renderChakraPanel();
+  renderQuestion();
+  toast(`歡迎，${user.name}`);
+}
+
+document.getElementById('guest-start').addEventListener('click', () => {
+  const email = document.getElementById('guest-email').value.trim();
+  const name = document.getElementById('guest-name').value.trim() || (email ? email.split('@')[0] : '訪客');
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) { toast('請輸入有效的 email'); return; }
+  loginAs({ email, name, provider: 'guest' });
+});
+document.getElementById('btn-logout').addEventListener('click', () => {
+  state.user = null; state.index = 0; state.answers = {};
+  show('intro');
+});
+document.getElementById('btn-restart').addEventListener('click', () => {
+  if (!confirm('確定要清除目前回答並重新作答？')) return;
+  state.index = 0; state.answers = {}; clearStore();
+  renderChakraPanel(); renderQuestion(); show('app-screen');
+});
+document.getElementById('btn-back-app').addEventListener('click', () => show('app-screen'));
+
+/* ══════════════════════════════════════════════════════════════
+   CHAKRA SCORING
+   每填寫一個 ≥13 字的欄位 → 該脈輪 +1 score
+   每題填 1 個欄位 → slow（spin=8s）
+   每題填 2+ 欄位  → fast（spin=3s）
+   完全沒填 → 不轉
+   總分百分比 = score / 該脈輪題目可填欄位總數
+   ══════════════════════════════════════════════════════════════ */
+function chakraStats() {
+  const stats = {}; CHAKRA_ORDER.forEach(c => stats[c] = { score: 0, max: 0, filledQs: 0, totalQs: 0, fastQs: 0 });
+  QUESTIONS.forEach(q => {
+    stats[q.chakra].totalQs += 1;
+    stats[q.chakra].max += q.fields.length;
+    const ans = state.answers[q.n] || {};
+    let filled = 0;
+    q.fields.forEach(([k]) => { if ((ans[k] || '').trim().length >= MIN_CHARS) filled += 1; });
+    stats[q.chakra].score += filled;
+    if (filled >= 1) stats[q.chakra].filledQs += 1;
+    if (filled >= 2) stats[q.chakra].fastQs += 1;
+  });
+  CHAKRA_ORDER.forEach(c => {
+    const s = stats[c];
+    s.pct = s.max ? Math.round((s.score / s.max) * 100) : 0;
+  });
+  return stats;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CHAKRA PANEL
+   ══════════════════════════════════════════════════════════════ */
+function renderChakraPanel() {
+  const stats = chakraStats();
+  const list = document.getElementById('chakra-list');
+  const currentQ = QUESTIONS[state.index];
+  list.innerHTML = CHAKRA_ORDER.map(key => {
+    const c = CHAKRAS[key]; const s = stats[key];
+    const spinning = s.filledQs > 0;
+    const spinDur = s.fastQs > 0 ? 3 : 8;
+    const isActive = currentQ && currentQ.chakra === key;
+    return `
+      <div class="chakra-row ${spinning ? 'spinning' : ''} ${isActive ? 'active' : ''}"
+           style="color:${c.theme};--spin:${spinDur}s;--spin2:${spinDur*1.5}s;">
+        <div class="chakra-orb"></div>
+        <div class="chakra-meta">
+          <div class="chakra-name"><span>${c.cn} · ${c.en}</span><span class="pct">${s.pct}%</span></div>
+          <div class="chakra-bar"><div class="chakra-fill" style="width:${s.pct}%"></div></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   QUESTION RENDER
+   ══════════════════════════════════════════════════════════════ */
+function renderQuestion() {
+  const q = QUESTIONS[state.index];
+  const ans = state.answers[q.n] || (state.answers[q.n] = {});
+  const c = CHAKRAS[q.chakra];
+
+  document.getElementById('progress-text').textContent = `第 ${state.index + 1} / ${QUESTIONS.length} 題`;
+  const pct = Math.round(((state.index) / QUESTIONS.length) * 100);
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  const host = document.getElementById('question-host');
+  host.innerHTML = `
+    <div class="question-card">
+      <span class="q-chakra-badge" style="color:${c.theme};background:${c.theme}1a;border:1px solid ${c.theme}55;">
+        <span class="mini-orb"></span>${c.cn} · ${c.en}
+      </span>
+      <div class="q-num">Q${q.n} / 36</div>
+      <div class="q-text">${q.text}</div>
+      ${q.hint ? `<div class="q-hint">提示：${q.hint}　／　每欄位至少 ${MIN_CHARS} 字</div>` : `<div class="q-hint">每欄位至少 ${MIN_CHARS} 字（選 1 ~ 多個欄位回答）</div>`}
+      <div class="field-grid">
+        ${q.fields.map(([k, ph], i) => `
+          <div class="field" data-field="${k}">
+            <div class="field-label">
+              <span>${k}</span>
+              <span class="field-counter" data-counter="${k}">0 / ${MIN_CHARS}</span>
+            </div>
+            <textarea class="field-input" data-input="${k}" placeholder="${ph}（≥ ${MIN_CHARS} 字）">${(ans[k] || '').replace(/</g,'&lt;')}</textarea>
+          </div>
+        `).join('')}
+      </div>
+      <div class="q-foot">
+        <div class="q-foot-meta">已填 <strong id="filled-count">0</strong> / ${q.fields.length} 欄位　·　至少填 1 個</div>
+        <div class="q-nav">
+          <button class="nav-btn" id="btn-prev" ${state.index === 0 ? 'disabled' : ''}>← 上一題</button>
+          <button class="nav-btn primary" id="btn-next">${state.index === QUESTIONS.length - 1 ? '完成 →' : '下一題 →'}</button>
+        </div>
+      </div>
+    </div>`;
+
+  q.fields.forEach(([k]) => {
+    const ta = host.querySelector(`[data-input="${k}"]`);
+    const counter = host.querySelector(`[data-counter="${k}"]`);
+    const fieldEl = host.querySelector(`[data-field="${k}"]`);
+    const update = () => {
+      const val = ta.value;
+      ans[k] = val;
+      const len = val.trim().length;
+      counter.textContent = `${len} / ${MIN_CHARS}`;
+      counter.classList.toggle('ok', len >= MIN_CHARS);
+      fieldEl.classList.toggle('valid', len >= MIN_CHARS);
+      updateFilledCount();
+      renderChakraPanel();
+      save();
+    };
+    ta.addEventListener('input', update);
+    update();
+  });
+
+  document.getElementById('btn-prev').addEventListener('click', () => { if (state.index > 0) { state.index -= 1; save(); renderQuestion(); renderChakraPanel(); } });
+  document.getElementById('btn-next').addEventListener('click', goNext);
+}
+
+function updateFilledCount() {
+  const q = QUESTIONS[state.index];
+  const ans = state.answers[q.n] || {};
+  const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= MIN_CHARS).length;
+  const el = document.getElementById('filled-count');
+  if (el) el.textContent = filled;
+}
+
+function goNext() {
+  const q = QUESTIONS[state.index];
+  const ans = state.answers[q.n] || {};
+  const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= MIN_CHARS).length;
+  if (filled === 0) { toast(`本題請至少填 1 個欄位（≥ ${MIN_CHARS} 字）`); return; }
+  if (state.index < QUESTIONS.length - 1) {
+    state.index += 1; save(); renderQuestion(); renderChakraPanel();
+  } else {
+    state.index = QUESTIONS.length; save(); renderResult(); show('result');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESULT
+   ══════════════════════════════════════════════════════════════ */
+function renderResult() {
+  const stats = chakraStats();
+  const grid = document.getElementById('chakra-grid');
+  grid.innerHTML = CHAKRA_ORDER.map(k => {
+    const c = CHAKRAS[k]; const s = stats[k];
+    return `
+      <div class="chakra-card" style="color:${c.theme};">
+        <div class="chakra-card-name">${c.en}</div>
+        <div class="chakra-card-cn">${c.cn}</div>
+        <div class="chakra-card-pct">${s.pct}%</div>
+        <div class="chakra-card-bar"><div class="chakra-card-bar-fill" style="width:${s.pct}%"></div></div>
+        <div class="chakra-card-desc">${c.desc}<br><span style="color:var(--muted);font-size:0.72rem;">${s.score}/${s.max} 欄位 · ${s.filledQs}/${s.totalQs} 題</span></div>
+      </div>`;
+  }).join('');
+
+  const list = document.getElementById('answers-list');
+  list.innerHTML = QUESTIONS.map(q => {
+    const ans = state.answers[q.n] || {};
+    const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= MIN_CHARS);
+    if (!filled.length) return '';
+    return `
+      <div class="answer-item">
+        <div class="answer-q">Q${q.n}．${q.text}</div>
+        ${filled.map(([k]) => `<div class="answer-field"><b>${k}</b>${(ans[k] || '').replace(/</g,'&lt;')}</div>`).join('')}
+      </div>`;
+  }).filter(Boolean).join('') || '<p style="color:var(--muted);font-size:0.85rem;">尚無有效回答</p>';
+
+  refreshShareLinks();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   EXPORT / SHARE
+   ══════════════════════════════════════════════════════════════ */
+const CHANNEL_URL = 'https://t.me/sam00may';
+
+function buildPayload() {
+  return {
+    user: state.user,
+    completedAt: new Date().toISOString(),
+    chakras: chakraStats(),
+    answers: QUESTIONS.map(q => ({
+      n: q.n, chakra: q.chakra, text: q.text,
+      fields: Object.fromEntries(q.fields.map(([k]) => [k, (state.answers[q.n] || {})[k] || '']))
+    }))
+  };
+}
+
+function buildMarkdown() {
+  const stats = chakraStats();
+  const u = state.user || { name: '訪客', email: '' };
+  const lines = [];
+  lines.push(`# 身心靈檢測 · 36問脈輪共振`);
+  lines.push(``);
+  lines.push(`> **${u.name}**（${u.email || '未登入'}）　·　${new Date().toLocaleString()}`);
+  lines.push(`> 📡 由 [t.me/sam00may](${CHANNEL_URL}) 製作分享`);
+  lines.push(``);
+  lines.push(`## 🌈 脈輪能量圖譜`);
+  lines.push(``);
+  lines.push(`| 脈輪 | 中文 | 共振% | 已填欄位 | 已答題 |`);
+  lines.push(`|---|---|---|---|---|`);
+  CHAKRA_ORDER.forEach(k => {
+    const c = CHAKRAS[k]; const s = stats[k];
+    lines.push(`| ${c.en} | ${c.cn} | **${s.pct}%** | ${s.score}/${s.max} | ${s.filledQs}/${s.totalQs} |`);
+  });
+  lines.push(``);
+  lines.push(`## 📜 36 題回答`);
+  lines.push(``);
+  QUESTIONS.forEach(q => {
+    const ans = state.answers[q.n] || {};
+    const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= MIN_CHARS);
+    if (!filled.length) return;
+    lines.push(`### Q${q.n}．${q.text}`);
+    lines.push(`> 對應脈輪：${CHAKRAS[q.chakra].cn} (${CHAKRAS[q.chakra].en})`);
+    lines.push(``);
+    filled.forEach(([k]) => { lines.push(`- **${k}**：${(ans[k] || '').trim()}`); });
+    lines.push(``);
+  });
+  lines.push(`---`);
+  lines.push(`📡 更多測驗 · 訂閱頻道：[t.me/sam00may](${CHANNEL_URL})`);
+  return lines.join('\n');
+}
+
+function buildShareSummary() {
+  const stats = chakraStats();
+  const u = state.user || { name: '訪客' };
+  const top = CHAKRA_ORDER.map(k => ({ k, cn: CHAKRAS[k].cn, pct: stats[k].pct }))
+    .sort((a, b) => b.pct - a.pct);
+  const lines = [];
+  lines.push(`🌈 ${u.name} 的身心靈檢測 · 36問脈輪結果`);
+  lines.push(``);
+  top.forEach(t => lines.push(`${t.cn}：${t.pct}%`));
+  lines.push(``);
+  lines.push(`最強：${top[0].cn} ${top[0].pct}%`);
+  lines.push(`最待開發：${top[top.length-1].cn} ${top[top.length-1].pct}%`);
+  lines.push(``);
+  lines.push(`📡 測驗來自：${CHANNEL_URL}`);
+  return lines.join('\n');
+}
+
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function fileStub() {
+  const id = (state.user?.email || 'guest').replace(/[^a-z0-9]/gi, '_');
+  return `chakra36_${id}_${Date.now()}`;
+}
+
+function exportJson()     { downloadBlob(JSON.stringify(buildPayload(), null, 2), fileStub() + '.json', 'application/json'); toast('已匯出 JSON'); }
+function exportMarkdown() { downloadBlob(buildMarkdown(), fileStub() + '.md', 'text/markdown'); toast('已匯出 Markdown'); }
+function exportPdf()      { toast('開啟列印視窗 → 選「儲存為 PDF」'); setTimeout(() => window.print(), 300); }
+
+async function copyToClipboard() {
+  try {
+    await navigator.clipboard.writeText(buildMarkdown());
+    toast('已複製 Markdown 到剪貼簿');
+  } catch {
+    toast('複製失敗，請手動匯出');
+  }
+}
+
+function refreshShareLinks() {
+  const summary = buildShareSummary();
+  const enc = encodeURIComponent(summary);
+  const url = encodeURIComponent(CHANNEL_URL);
+  const subj = encodeURIComponent('我的身心靈檢測 · 36問脈輪結果');
+
+  document.getElementById('btn-email').href    = `mailto:?subject=${subj}&body=${enc}`;
+  document.getElementById('btn-tg').href       = `https://t.me/share/url?url=${url}&text=${enc}`;
+  document.getElementById('btn-line').href     = `https://line.me/R/msg/text/?${enc}`;
+  document.getElementById('btn-wa').href       = `https://wa.me/?text=${enc}`;
+  document.getElementById('btn-im').href       = `sms:&body=${enc}`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOAST
+   ══════════════════════════════════════════════════════════════ */
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CHANNEL POSTS
+   ══════════════════════════════════════════════════════════════ */
+let channelFilter = 'all';
+function renderChannelPage() {
+  const tabs = document.getElementById('ch-tabs');
+  tabs.innerHTML = CHANNEL_CATS.map(c => `
+    <button class="ch-tab ${channelFilter === c.key ? 'active' : ''}" data-cat="${c.key}">
+      ${c.emoji} ${c.label}
+    </button>
+  `).join('');
+  tabs.querySelectorAll('.ch-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      channelFilter = btn.dataset.cat;
+      renderChannelPage();
+    });
+  });
+
+  const grid = document.getElementById('ch-grid');
+  const posts = CHANNEL_POSTS.filter(p => channelFilter === 'all' || p.cat === channelFilter);
+  grid.innerHTML = posts.map(p => {
+    const cat = CHANNEL_CATS.find(c => c.key === p.cat);
+    const bg = cat.color + '22';
+    return `
+      <a class="ch-card" href="https://t.me/sam00may/${p.id}" target="_blank" rel="noopener"
+         style="--accent-c:${cat.color};--accent-c-bg:${bg};">
+        <div class="ch-meta">
+          <span class="ch-cat-pill">${cat.emoji} ${cat.label}</span>
+          <span>· #${p.id}</span>
+        </div>
+        <h4>${p.title}</h4>
+        <p>${p.excerpt}</p>
+        <div class="ch-card-foot">
+          <span class="read">在 Telegram 開啟 →</span>
+          <span style="color:var(--muted);">t.me/sam00may</span>
+        </div>
+      </a>`;
+  }).join('') || '<p style="color:var(--muted);text-align:center;padding:40px;">這個分類暫無文章</p>';
+}
+
+document.getElementById('btn-view-channel').addEventListener('click', () => {
+  renderChannelPage();
+  show('channel');
+});
+document.getElementById('btn-channel-back').addEventListener('click', () => {
+  show(state.user ? 'app-screen' : 'intro');
+});
+
+/* ══════════════════════════════════════════════════════════════
+   BOOT
+   ══════════════════════════════════════════════════════════════ */
+document.getElementById('btn-md').addEventListener('click', exportMarkdown);
+document.getElementById('btn-pdf').addEventListener('click', exportPdf);
+document.getElementById('btn-json').addEventListener('click', exportJson);
+document.getElementById('btn-copy').addEventListener('click', copyToClipboard);
+document.getElementById('year').textContent = new Date().getFullYear();
+
+setupGoogleAuth();
+</script>
+</body>
+</html>
