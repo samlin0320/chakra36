@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天選職業 — AI 天賦挖掘教練</title>
+<style>
+  :root {
+    --bg: #0a0a14;
+    --surface: #131322;
+    --card: #1a1a2e;
+    --card2: #20203a;
+    --accent: #fbbf24;       /* gold */
+    --accent2: #f59e0b;
+    --accent3: #c084fc;      /* purple */
+    --accent4: #60a5fa;      /* blue */
+    --green: #34d399;
+    --pink: #f472b6;
+    --text: #e8e8f0;
+    --muted: #94a3b8;
+    --muted2: #64748b;
+    --border: #2a2a3e;
+    --border2: #3a3a52;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; animation: fade .4s ease-out; }
+  .screen.active { display: block; }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ══ INTRO ══ */
+  #intro {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse 70% 45% at 50% 0%, rgba(251,191,36,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 35% at 50% 100%, rgba(192,132,252,0.10) 0%, transparent 60%);
+    position: relative;
+    overflow: hidden;
+  }
+  #intro::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(251,191,36,0.06) 0%, transparent 30%),
+      radial-gradient(circle at 80% 70%, rgba(96,165,250,0.06) 0%, transparent 30%);
+    pointer-events: none;
+  }
+  .stars {
+    position: absolute; inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .star {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 0.6; transform: scale(1); }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(251,191,36,0.1);
+    border: 1px solid rgba(251,191,36,0.4);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .badge .pulse {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(251,191,36,0.7); }
+    70% { box-shadow: 0 0 0 8px rgba(251,191,36,0); }
+    100% { box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+  }
+  #intro h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 10%, var(--accent) 50%, var(--accent2) 90%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  #intro .subtitle {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 580px;
+    margin: 0 auto 36px;
+    position: relative;
+  }
+  #intro .subtitle b { color: var(--text); font-weight: 600; }
+
+  .intro-chips {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 44px;
+    position: relative;
+  }
+  .chip {
+    padding: 7px 16px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--border2);
+    background: rgba(255,255,255,0.02);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .chip:nth-child(1) .dot { background: var(--accent); }
+  .chip:nth-child(2) .dot { background: var(--accent3); }
+  .chip:nth-child(3) .dot { background: var(--accent4); }
+  .chip:nth-child(4) .dot { background: var(--green); }
+
+  /* Frameworks grid in intro */
+  .frameworks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    max-width: 720px;
+    margin: 0 auto 40px;
+    position: relative;
+  }
+  .fw {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 14px;
+    text-align: left;
+    transition: all .3s;
+  }
+  .fw:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .fw-icon {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+  }
+  .fw-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .fw-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 14px 32px;
+    border-radius: 12px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    color: #1a1a1a;
+    box-shadow: 0 8px 24px rgba(251,191,36,0.25), 0 0 0 0 rgba(251,191,36,0);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(251,191,36,0.4);
+  }
+  .btn-secondary {
+    background: var(--card2);
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    background: var(--card);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover {
+    color: var(--text);
+    border-color: var(--border2);
+  }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  /* ══ QUESTIONS ══ */
+  #quiz {
+    min-height: 100vh;
+    padding: 24px 20px 80px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-top: 8px;
+  }
+  .quiz-logo {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .quiz-logo span { color: var(--accent); }
+  .quiz-counter {
+    font-size: 0.85rem;
+    color: var(--muted);
+    background: var(--card);
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+  }
+  .quiz-counter b { color: var(--accent); }
+
+  .progress-track {
+    height: 6px;
+    background: var(--card);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 36px;
+    position: relative;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent3) 0%, var(--accent) 50%, var(--pink) 100%);
+    border-radius: 999px;
+    transition: width .5s cubic-bezier(.4,.0,.2,1);
+    width: 0%;
+    box-shadow: 0 0 12px rgba(251,191,36,0.5);
+  }
+
+  .question-card {
+    background: linear-gradient(180deg, var(--card) 0%, var(--surface) 100%);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, var(--accent), var(--accent3));
+  }
+  .q-angle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(192,132,252,0.12);
+    border: 1px solid rgba(192,132,252,0.3);
+    color: var(--accent3);
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+  }
+  .q-angle .icon { font-size: 0.95rem; }
+
+  .q-text {
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .q-hint {
+    font-size: 0.92rem;
+    color: var(--muted);
+    margin-bottom: 22px;
+    line-height: 1.65;
+  }
+  .q-hint b { color: var(--accent3); font-weight: 600; }
+
+  textarea {
+    width: 100%;
+    min-height: 140px;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.65;
+    resize: vertical;
+    transition: all .2s;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(251,191,36,0.12);
+  }
+  textarea::placeholder { color: var(--muted2); }
+
+  .char-count {
+    text-align: right;
+    font-size: 0.78rem;
+    color: var(--muted2);
+    margin-top: 6px;
+  }
+  .char-count.warn { color: var(--accent); }
+
+  .quiz-nav {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  /* Quick chip suggestions */
+  .quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .quick-chip {
+    background: rgba(96,165,250,0.08);
+    border: 1px solid rgba(96,165,250,0.25);
+    color: var(--accent4);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: inherit;
+  }
+  .quick-chip:hover {
+    background: rgba(96,165,250,0.15);
+    border-color: var(--accent4);
+    transform: translateY(-1px);
+  }
+
+  /* ══ REPORT ══ */
+  #report {
+    padding: 40px 20px 80px;
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  .report-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .report-header .badge {
+    background: rgba(52,211,153,0.12);
+    border-color: rgba(52,211,153,0.4);
+    color: var(--green);
+  }
+  .report-header .badge .pulse {
+    background: var(--green);
+    box-shadow: 0 0 0 0 var(--green);
+    animation: pulse-green 2s infinite;
+  }
+  @keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(52,211,153,0.7); }
+    70% { box-shadow: 0 0 0 8px rgba(52,211,153,0); }
+    100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+  }
+  .report-header h1 {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 800;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .report-header p {
+    color: var(--muted);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .report-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 24px;
+    margin-bottom: 18px;
+  }
+  .report-section h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .report-section h2 .num {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #1a1a1a;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 800;
+  }
+  .report-section .desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+
+  .answer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .answer-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent3);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .answer-item .q {
+    font-size: 0.82rem;
+    color: var(--accent3);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .answer-item .a {
+    font-size: 0.95rem;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Prompt box */
+  .prompt-box {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 16px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.86rem;
+    color: var(--muted);
+    max-height: 320px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.7;
+  }
+  .prompt-box::-webkit-scrollbar { width: 8px; }
+  .prompt-box::-webkit-scrollbar-track { background: var(--surface); }
+  .prompt-box::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+  .copy-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+
+  .ai-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .ai-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all .2s;
+  }
+  .ai-link:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    background: var(--card);
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 32px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent);
+    color: #1a1a1a;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    box-shadow: 0 12px 32px rgba(251,191,36,0.4);
+    z-index: 1000;
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 600px) {
+    #intro { padding: 32px 18px; }
+    .question-card { padding: 24px 20px; }
+    .q-text { font-size: 1.18rem; }
+    .quiz-nav { flex-direction: column-reverse; }
+    .quiz-nav .btn { width: 100%; justify-content: center; }
+    .footer-actions .btn { width: 100%; justify-content: center; }
+    .report-section { padding: 22px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ INTRO SCREEN ══════════ -->
+<section id="intro" class="screen active">
+  <div class="stars" id="stars"></div>
+
+  <div class="badge">
+    <span class="pulse"></span>
+    AI 天賦挖掘 × 蘇格拉底提問
+  </div>
+
+  <h1>找到你的<br>「天選職業」</h1>
+
+  <p class="subtitle">
+    升職加薪最快的路徑，不是補齊短板成為一個 60 分的通才，而是<b>讓你的長處在對的環境裡發揮最大價值</b>。<br>
+    讓 AI 結合四套職業心理學模型，用 10 個直擊心靈的問題，挖出你連自己都沒意識到的天賦。
+  </p>
+
+  <div class="intro-chips">
+    <div class="chip"><span class="dot"></span>10 題</div>
+    <div class="chip"><span class="dot"></span>約 15 分鐘</div>
+    <div class="chip"><span class="dot"></span>4 套理論</div>
+    <div class="chip"><span class="dot"></span>產出 7 個職位建議</div>
+  </div>
+
+  <div class="frameworks">
+    <div class="fw">
+      <div class="fw-icon">🎯</div>
+      <div class="fw-title">霍蘭德職業興趣</div>
+      <div class="fw-desc">RIASEC 六型人格與職業對應</div>
+    </div>
+    <div class="fw">
+      <div class="fw-icon">🌊</div>
+      <div class="fw-title">心流理論</div>
+      <div class="fw-desc">Csikszentmihalyi 沉浸體驗</div>
+    </div>
+    <div class="fw">
+      <div class="fw-icon">💎</div>
+      <div class="fw-title">蓋洛普優勢</div>
+      <div class="fw-desc">CliftonStrengths 34 項天賦</div>
+    </div>
+    <div class="fw">
+      <div class="fw-icon">🧩</div>
+      <div class="fw-title">人境匹配模型</div>
+      <div class="fw-desc">P-E Fit 環境契合度</div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; position: relative;">
+    <button class="btn btn-primary" onclick="startQuiz()">
+      開始挖掘 →
+    </button>
+    <button class="btn btn-ghost" onclick="loadDraft()" id="loadBtn" style="display:none;">
+      繼續上次作答
+    </button>
+  </div>
+
+  <p style="margin-top: 32px; font-size: 0.78rem; color: var(--muted2); position: relative;">
+    所有答案僅儲存在你的瀏覽器本機，不會上傳任何伺服器
+  </p>
+</section>
+
+<!-- ══════════ QUIZ SCREEN ══════════ -->
+<section id="quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-logo">天選職業<span>·</span>天賦挖掘</div>
+    <div class="quiz-counter">
+      第 <b id="q-num">1</b> / 10 題
+    </div>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+
+  <div class="question-card" id="qCard">
+    <!-- filled by JS -->
+  </div>
+
+  <div class="quiz-nav">
+    <button class="btn btn-ghost" id="prevBtn" onclick="prevQ()">← 上一題</button>
+    <button class="btn btn-primary" id="nextBtn" onclick="nextQ()">下一題 →</button>
+  </div>
+</section>
+
+<!-- ══════════ REPORT SCREEN ══════════ -->
+<section id="report" class="screen">
+  <div class="report-header">
+    <div class="badge">
+      <span class="pulse"></span>
+      作答完成 · 你的職涯說明書已生成
+    </div>
+    <h1>你的天賦原料庫</h1>
+    <p>把下方提示詞貼給 ChatGPT、Claude 或 Gemini，讓 AI 幫你產出完整的「10 個天賦模塊 + 7 個崗位建議 + 適合團隊配置」分析報告。</p>
+  </div>
+
+  <!-- AI Prompt -->
+  <div class="report-section">
+    <h2><span class="num">1</span>客製化 AI 提示詞</h2>
+    <p class="desc">這份提示詞已經帶入你的 10 個答案，AI 會基於四大心理學模型分析你的天賦。</p>
+    <div class="prompt-box" id="promptBox"></div>
+    <div class="copy-row">
+      <button class="btn btn-primary" onclick="copyPrompt()">📋 複製完整提示詞</button>
+      <button class="btn btn-secondary" onclick="downloadPrompt()">💾 下載為 .txt</button>
+    </div>
+    <div class="ai-links">
+      <a href="https://claude.ai/new" target="_blank" class="ai-link">→ Claude</a>
+      <a href="https://chat.openai.com/" target="_blank" class="ai-link">→ ChatGPT</a>
+      <a href="https://gemini.google.com/app" target="_blank" class="ai-link">→ Gemini</a>
+      <a href="https://chat.deepseek.com/" target="_blank" class="ai-link">→ DeepSeek</a>
+    </div>
+  </div>
+
+  <!-- Answer recap -->
+  <div class="report-section">
+    <h2><span class="num">2</span>你的 10 個答案</h2>
+    <p class="desc">這些是 AI 進行分析的原始素材，建議在貼給 AI 前先檢查一遍。</p>
+    <div class="answer-list" id="answerList"></div>
+  </div>
+
+  <!-- Quick insights -->
+  <div class="report-section">
+    <h2><span class="num">3</span>初步觀察</h2>
+    <p class="desc">本機演算法快速整理出的關鍵詞與面向（完整深度分析請使用上方 AI 提示詞）。</p>
+    <div id="insights"></div>
+  </div>
+
+  <div class="footer-actions">
+    <button class="btn btn-secondary" onclick="restart()">🔄 重新作答</button>
+    <button class="btn btn-ghost" onclick="goIntro()">← 回首頁</button>
+  </div>
+</section>
+
+<div class="toast" id="toast">已複製到剪貼簿</div>
+
+<script>
+// ══════════ DATA ══════════
+const QUESTIONS = [
+  {
+    angle: '心流視角 · 能量來源',
+    icon: '🌊',
+    text: '過去三個月裡，做哪一件事讓你做完之後反而更有精神，甚至覺得時間飛快地過去？',
+    hint: '這通常指向你的<b>心流活動</b>。請具體描述當時在做什麼、跟誰一起、為什麼會進入這種狀態。',
+    placeholder: '例如：上週幫朋友重新設計簡報結構，本來只是隨手幫忙，結果一弄就是 4 小時，做完雖然累但腦袋很清醒……',
+    chips: ['做設計時', '解決複雜問題時', '幫人想策略時', '寫東西時', '帶領小組時']
+  },
+  {
+    angle: '能量消耗視角 · 反指標',
+    icon: '🪫',
+    text: '哪一類工作或任務即使結果不錯，做完也讓你身心俱疲、不想再碰？',
+    hint: '能量消耗多寡比「會不會做」更能揭露你的真實天賦。<b>消耗大的事，通常是天賦的反方向。</b>',
+    placeholder: '例如：和大量陌生客戶開電話會議；填細節繁雜的表格；處理人際矛盾……',
+    chips: ['重複性行政工作', '陌生社交', '細節核對', '說服他人', '獨自埋頭做事']
+  },
+  {
+    angle: '榜樣視角 · 渴望成為',
+    icon: '⭐',
+    text: '你最佩服的人是誰？具體佩服他/她身上的哪一種能力或特質？',
+    hint: '榜樣是你<b>潛意識想成為的樣子</b>。請寫下這個人的名字以及最讓你佩服的那一個特質。',
+    placeholder: '例如：佩服我前主管 W，他能在五分鐘內把一個混亂的議題講得清清楚楚，讓所有人秒懂下一步要做什麼……',
+    chips: ['某位前輩', '某位 KOL', '某位歷史人物', '某位作家', '某位創業者']
+  },
+  {
+    angle: '嫉妒視角 · 暴露真實渴望',
+    icon: '🔥',
+    text: '最近一次嫉妒別人是什麼時候？嫉妒他擁有什麼？',
+    hint: '嫉妒是反直覺但極準確的訊號 — <b>你嫉妒的東西，往往是你內心最渴望、卻還沒得到的</b>。',
+    placeholder: '例如：嫉妒同事 J 在會議上能把老闆問題接得很漂亮；嫉妒朋友開始做自己的個人品牌……',
+    chips: ['表達能力', '影響力', '自由', '財富', '被認可', '創造作品']
+  },
+  {
+    angle: '童年視角 · 原生天賦',
+    icon: '🌱',
+    text: '童年或學生時期，老師、家人、朋友常稱讚你哪一種「跟別人不一樣」的特質？',
+    hint: '童年的稱讚通常還未被職場規訓，是<b>最接近原生天賦</b>的訊號。',
+    placeholder: '例如：老師說我寫的作文很有自己的觀點；同學說我講笑話總能戳中笑點；家人說我特別有同理心……',
+    chips: ['很會講話', '很有想法', '很有耐心', '反應快', '很會帶動氣氛', '專注力強']
+  },
+  {
+    angle: '不為錢做視角 · 內在動機',
+    icon: '💖',
+    text: '如果不考慮收入和他人眼光，你願意持續做 5 年的事是什麼？',
+    hint: '排除外部誘因，剩下的就是<b>真正的內在動機</b>。可以是工作，也可以是興趣。',
+    placeholder: '例如：研究心理學並把它寫成科普文章；做小型線下活動把不同領域的人連起來……',
+    chips: ['寫作', '研究某主題', '幫人成長', '創作作品', '探索新領域']
+  },
+  {
+    angle: '他人視角 · 別人覺得你輕鬆',
+    icon: '👥',
+    text: '同事或朋友最常請你幫忙的事情是什麼？哪些是他們覺得難、但你覺得很容易的？',
+    hint: '<b>「別人卡關但你輕鬆完成」的事，就是天賦的證據</b>。請具體舉例。',
+    placeholder: '例如：他們常請我幫忙看報告邏輯有沒有漏洞，我大概十分鐘就能找出問題，但他們會卡很久……',
+    chips: ['整理思路', '寫文案', '看數據', '安撫情緒', '組織活動', '技術問題']
+  },
+  {
+    angle: '價值底線視角 · 絕對不能忍',
+    icon: '🛑',
+    text: '在工作中，哪一件事是你絕對無法接受的？（例如：被微管理、做沒意義的事、不被信任）',
+    hint: '價值底線決定<b>環境匹配度</b>，比起「喜歡什麼」，「無法忍受什麼」更能篩選出對的職位。',
+    placeholder: '例如：絕對受不了沒有自主決策空間；受不了主管朝令夕改；受不了做完全感受不到意義的數字……',
+    chips: ['沒有自主性', '不被信任', '官僚流程', '價值觀衝突', '無法成長', '高度競爭']
+  },
+  {
+    angle: '環境匹配視角 · 適合的氛圍',
+    icon: '🧩',
+    text: '回想你過去表現最好的時期，當時的團隊氛圍是怎樣的？（高壓快節奏／協作型／獨立自由／結構嚴謹）',
+    hint: '同樣的能力，在錯的環境會被埋沒。請描述那個讓你<b>狀態最好</b>的工作環境。',
+    placeholder: '例如：5 人左右的小團隊，主管給方向但不管細節，可以遠端，每週一次同步，問題快速 ping 解決……',
+    chips: ['小型敏捷團隊', '大型結構型', '純遠端', '高度創意', '高頻回饋', '低干擾深度工作']
+  },
+  {
+    angle: '十年動機視角 · 終局想像',
+    icon: '🎯',
+    text: '想像 10 年後最好的版本，你正在做什麼？是什麼讓你覺得「這就對了」？',
+    hint: '這道題揭露你的<b>深層動機</b> — 是渴望影響力、創造、自由、安穩，還是被驗證？',
+    placeholder: '例如：10 年後我有自己的小工作室，三、四個夥伴，做的東西被很多人實際使用過，每年能挑兩三個我真的想做的案子……',
+    chips: ['創立自己的事業', '成為領域專家', '自由生活', '帶大團隊', '有作品流傳']
+  }
+];
+
+const KEY = 'talentFinderAnswers_v1';
+let answers = Array(10).fill('');
+let current = 0;
+
+// ══════════ STARS ══════════
+function makeStars() {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = Math.random() * 4 + 's';
+    s.style.width = s.style.height = (Math.random() * 2 + 1) + 'px';
+    c.appendChild(s);
+  }
+}
+makeStars();
+
+// ══════════ DRAFT ══════════
+function loadFromStorage() {
+  try {
+    const saved = localStorage.getItem(KEY);
+    if (saved) {
+      const obj = JSON.parse(saved);
+      if (obj.answers && Array.isArray(obj.answers) && obj.answers.length === 10) {
+        const filled = obj.answers.filter(a => a && a.trim()).length;
+        if (filled > 0) {
+          document.getElementById('loadBtn').style.display = 'inline-flex';
+          document.getElementById('loadBtn').textContent = `繼續上次作答（${filled}/10）`;
+          return obj.answers;
+        }
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+function saveToStorage() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify({ answers, current, ts: Date.now() }));
+  } catch (e) {}
+}
+function loadDraft() {
+  const draft = loadFromStorage();
+  if (draft) {
+    answers = draft;
+    current = answers.findIndex(a => !a || !a.trim());
+    if (current === -1) current = 0;
+    startQuiz();
+  }
+}
+loadFromStorage();
+
+// ══════════ NAVIGATION ══════════
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function startQuiz() {
+  show('quiz');
+  renderQ();
+}
+function goIntro() { show('intro'); }
+
+// ══════════ RENDER QUESTION ══════════
+function renderQ() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-num').textContent = current + 1;
+  document.getElementById('progress').style.width = ((current + 1) / 10 * 100) + '%';
+
+  const card = document.getElementById('qCard');
+  card.innerHTML = `
+    <div class="q-angle"><span class="icon">${q.icon}</span>${q.angle}</div>
+    <div class="q-text">${q.text}</div>
+    <div class="q-hint">${q.hint}</div>
+    <div class="quick-chips">
+      ${q.chips.map(c => `<button class="quick-chip" onclick="appendChip('${c.replace(/'/g, "\\'")}')">+ ${c}</button>`).join('')}
+    </div>
+    <textarea id="ansInput" placeholder="${q.placeholder}" oninput="onAnswer(this.value)">${answers[current] || ''}</textarea>
+    <div class="char-count" id="charCount">${(answers[current] || '').length} 字</div>
+  `;
+  setTimeout(() => document.getElementById('ansInput').focus(), 100);
+  updateNav();
+}
+
+function appendChip(text) {
+  const ta = document.getElementById('ansInput');
+  const cur = ta.value.trim();
+  ta.value = cur ? `${cur} ${text}` : text;
+  onAnswer(ta.value);
+  ta.focus();
+}
+
+function onAnswer(v) {
+  answers[current] = v;
+  document.getElementById('charCount').textContent = `${v.length} 字`;
+  document.getElementById('charCount').classList.toggle('warn', v.length > 0 && v.length < 10);
+  saveToStorage();
+  updateNav();
+}
+
+function updateNav() {
+  document.getElementById('prevBtn').disabled = current === 0;
+  const nextBtn = document.getElementById('nextBtn');
+  const ans = (answers[current] || '').trim();
+  nextBtn.disabled = ans.length < 5;
+  if (current === 9) nextBtn.textContent = '生成職涯說明書 ✨';
+  else nextBtn.textContent = '下一題 →';
+}
+
+function prevQ() {
+  if (current > 0) { current--; renderQ(); saveToStorage(); }
+}
+function nextQ() {
+  if ((answers[current] || '').trim().length < 5) return;
+  if (current < 9) { current++; renderQ(); saveToStorage(); }
+  else { generateReport(); }
+}
+
+// ══════════ REPORT ══════════
+function generateReport() {
+  show('report');
+  renderAnswers();
+  renderPrompt();
+  renderInsights();
+}
+
+function renderAnswers() {
+  const list = document.getElementById('answerList');
+  list.innerHTML = QUESTIONS.map((q, i) => `
+    <div class="answer-item">
+      <div class="q">Q${i + 1} · ${q.angle}</div>
+      <div class="a">${escapeHtml(answers[i] || '（未填）')}</div>
+    </div>
+  `).join('');
+}
+
+function buildPrompt() {
+  const answersBlock = QUESTIONS.map((q, i) =>
+    `${i + 1}. ${q.text}\n→ ${answers[i] || '（略）'}`
+  ).join('\n\n');
+
+  return `請你扮演一位資深職業生涯顧問。你相信職業選擇不是宿命論，相信天賦是可複用、可遷移、可驗證的能力模式。請結合下列四套核心心理學與組織行為學理論進行分析：
+
+• 霍蘭德職業興趣模型（RIASEC）
+• 心流理論（Csikszentmihalyi Flow Theory）
+• 蓋洛普優勢理論（CliftonStrengths）
+• 人與環境匹配模型（Person-Environment Fit）
+
+以下是我針對「天賦挖掘 10 問」的回答，每一題都從不同角度切入（心流、能量消耗、榜樣、嫉妒、童年、不為錢做、他人視角、價值底線、環境匹配、十年願景）：
+
+${answersBlock}
+
+請基於以上回答，輸出以下四個部分的深度分析（用清晰的標題分隔，避免空泛建議，每一項都引用我的具體回答作為依據）：
+
+【一、10 個天賦模塊】
+列出我可複用、可遷移的 10 種能力模式，每一項說明：模塊名稱、對應的心理學理論依據、從哪一題回答中觀察到。
+
+【二、適合的工作環境與團隊配置】
+依據人與環境匹配模型，描述：團隊規模、管理風格、工作節奏、決策權力、互動頻率、文化特徵。並指出哪幾種環境我會明顯被「埋沒」。
+
+【三、深層動機與價值底線】
+分析我真正在追求什麼（例如：影響力？創造？自由？驗證？），以及哪些是我絕對無法妥協的價值。請大膽推測，即使我自己沒明說的潛在動機也請點出。
+
+【四、7 個具體的工作崗位建議】
+給出 7 個具體職位（不要只給職類），每一項包括：職位名稱、為什麼適合（連結到我的天賦模塊）、面試時應該特別觀察哪些團隊特徵以驗證匹配度、可能的隱藏挑戰。
+
+請以坦率、有判斷力的口吻回答，不要客套，不要全部說「都很好」。如果有矛盾的訊號（例如我同時渴望自由又渴望被驗證），請點出來並分析。`;
+}
+
+function renderPrompt() {
+  document.getElementById('promptBox').textContent = buildPrompt();
+}
+
+function copyPrompt() {
+  const txt = buildPrompt();
+  navigator.clipboard.writeText(txt).then(() => toast('已複製完整提示詞 — 貼給 AI 即可分析'))
+    .catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = txt; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      toast('已複製');
+    });
+}
+
+function downloadPrompt() {
+  const blob = new Blob([buildPrompt()], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '天選職業-AI提示詞.txt';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('已下載');
+}
+
+function renderInsights() {
+  const all = answers.join(' ').toLowerCase();
+  const totalChars = answers.reduce((s, a) => s + a.length, 0);
+  const avgLen = Math.round(totalChars / 10);
+
+  const themes = [
+    { name: '創造與設計', kw: ['設計', '創意', '創作', '寫', '做出', '原創', '產品'], color: 'var(--accent3)' },
+    { name: '人際影響', kw: ['人', '溝通', '說服', '帶領', '影響', '客戶', '團隊', '領導'], color: 'var(--pink)' },
+    { name: '分析與策略', kw: ['分析', '邏輯', '策略', '結構', '思考', '解決', '數據', '研究'], color: 'var(--accent4)' },
+    { name: '自主與自由', kw: ['自由', '自主', '遠端', '獨立', '不被管', '自己決定'], color: 'var(--green)' },
+    { name: '成就與認可', kw: ['認可', '成就', '驗證', '勝利', '挑戰', '證明', '影響力'], color: 'var(--accent)' },
+    { name: '助人與意義', kw: ['幫', '意義', '同理', '陪伴', '支持', '服務', '改變'], color: '#f87171' },
+  ];
+
+  const scored = themes.map(t => ({
+    ...t,
+    score: t.kw.reduce((s, k) => s + (all.split(k).length - 1), 0)
+  })).sort((a, b) => b.score - a.score);
+
+  const top = scored.filter(t => t.score > 0).slice(0, 4);
+  const max = top[0]?.score || 1;
+
+  let html = `
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px;">
+      <div style="background: var(--bg); border:1px solid var(--border); border-radius: 12px; padding: 14px;">
+        <div style="font-size: 0.78rem; color: var(--muted); margin-bottom: 4px;">作答總字數</div>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent);">${totalChars}</div>
+      </div>
+      <div style="background: var(--bg); border:1px solid var(--border); border-radius: 12px; padding: 14px;">
+        <div style="font-size: 0.78rem; color: var(--muted); margin-bottom: 4px;">平均每題長度</div>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent3);">${avgLen} 字</div>
+      </div>
+      <div style="background: var(--bg); border:1px solid var(--border); border-radius: 12px; padding: 14px;">
+        <div style="font-size: 0.78rem; color: var(--muted); margin-bottom: 4px;">主導主題</div>
+        <div style="font-size: 1.1rem; font-weight: 800; color: ${top[0]?.color || 'var(--text)'};">${top[0]?.name || '需更多細節'}</div>
+      </div>
+    </div>
+  `;
+
+  if (top.length > 0) {
+    html += `<div style="margin-top: 8px;"><div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 10px;">關鍵詞主題分布（純粹基於字面比對，僅供參考）：</div>`;
+    top.forEach(t => {
+      const pct = Math.round(t.score / max * 100);
+      html += `
+        <div style="margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+            <span style="color: var(--text); font-weight: 600;">${t.name}</span>
+            <span style="color: var(--muted);">出現 ${t.score} 次</span>
+          </div>
+          <div style="height: 8px; background: var(--bg); border-radius: 999px; overflow: hidden;">
+            <div style="height: 100%; width: ${pct}%; background: ${t.color}; border-radius: 999px;"></div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  html += `<div style="margin-top: 16px; padding: 14px; background: rgba(251,191,36,0.06); border-left: 3px solid var(--accent); border-radius: 8px; font-size: 0.88rem; color: var(--muted);">💡 提示：上面只是字面關鍵詞統計，<b style="color: var(--text);">不能取代真正的天賦分析</b>。請務必把上方提示詞貼給 AI，由 AI 結合四套心理學模型才能產出有深度的「天賦模塊 + 崗位建議」。</div>`;
+
+  document.getElementById('insights').innerHTML = html;
+}
+
+function restart() {
+  if (!confirm('確定要清除所有答案重新開始嗎？')) return;
+  localStorage.removeItem(KEY);
+  answers = Array(10).fill('');
+  current = 0;
+  show('intro');
+  document.getElementById('loadBtn').style.display = 'none';
+}
+
+// ══════════ UTILS ══════════
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[c]);
+}
+
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// Keyboard nav
+document.addEventListener('keydown', (e) => {
+  if (!document.getElementById('quiz').classList.contains('active')) return;
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); nextQ(); }
+});
+</script>
+</body>
+</html>

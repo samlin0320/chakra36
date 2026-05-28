@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天選伴侶算法 — 關係需求畫像測驗</title>
+<style>
+  :root {
+    --bg: #0d0d14;
+    --surface: #16161f;
+    --card: #1e1e2e;
+    --accent: #c084fc;
+    --accent2: #f472b6;
+    --accent3: #60a5fa;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #2d2d3f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ══ INTRO ══ */
+  #intro {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    text-align: center;
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(192,132,252,0.18) 0%, transparent 70%);
+    position: relative;
+    overflow: hidden;
+  }
+  #intro::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23c084fc' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 14px;
+    background: rgba(192,132,252,0.15);
+    border: 1px solid rgba(192,132,252,0.35);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  #intro h1 {
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #e2e8f0 20%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  #intro .subtitle {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 540px;
+    margin: 0 auto 40px;
+    position: relative;
+  }
+  .intro-chips {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+    position: relative;
+  }
+  .chip {
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .start-btn {
+    position: relative;
+    padding: 16px 48px;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    box-shadow: 0 6px 30px rgba(192,132,252,0.4);
+    transition: all 0.25s;
+    letter-spacing: 0.5px;
+  }
+  .start-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(192,132,252,0.55); }
+
+  /* ══ QUIZ ══ */
+  #quiz {
+    min-height: 100vh;
+    padding: 0 24px 60px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* Progress bar */
+  .progress-bar-wrap {
+    padding: 28px 0 0;
+    margin-bottom: 32px;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .progress-track {
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+
+  /* Question card */
+  .question-wrap {
+    animation: fadeUp 0.35s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .q-dim-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba(192,132,252,0.1);
+    border: 1px solid rgba(192,132,252,0.25);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .q-text {
+    font-size: clamp(1.1rem, 3vw, 1.35rem);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 12px; }
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 20px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.95rem;
+    color: var(--text);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(192,132,252,0.08), rgba(244,114,182,0.05));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .option-btn:hover { border-color: var(--accent); transform: translateX(3px); }
+  .option-btn:hover::before { opacity: 1; }
+  .option-btn.selected {
+    border-color: var(--accent);
+    background: rgba(192,132,252,0.12);
+  }
+  .option-btn.selected .opt-key {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border-color: transparent;
+  }
+  .opt-key {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+  .opt-text { flex: 1; line-height: 1.55; }
+
+  /* Other option */
+  .option-btn.other-btn {
+    border-style: dashed;
+    border-color: rgba(148,163,184,0.4);
+    color: var(--muted);
+  }
+  .option-btn.other-btn:hover { border-color: var(--accent); border-style: dashed; color: var(--text); }
+  .option-btn.other-btn.selected { border-style: solid; }
+  .other-input-wrap {
+    display: none;
+    margin-top: 12px;
+    animation: fadeUp 0.2s ease both;
+  }
+  .other-input-wrap.visible { display: block; }
+  .other-textarea {
+    width: 100%;
+    min-height: 80px;
+    background: var(--card);
+    border: 1.5px solid var(--accent);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-size: 0.92rem;
+    font-family: inherit;
+    resize: vertical;
+    line-height: 1.6;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .other-textarea::placeholder { color: var(--muted); }
+  .other-textarea:focus { border-color: var(--accent2); }
+  .other-hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* Nav buttons */
+  .q-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    gap: 12px;
+  }
+  .nav-btn {
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    background: transparent;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover:not(:disabled) { border-color: var(--text); color: var(--text); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .nav-btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(192,132,252,0.3);
+  }
+  .nav-btn.primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(192,132,252,0.45); }
+  .nav-btn.primary:disabled { background: var(--border); box-shadow: none; color: var(--muted); }
+
+  /* ══ RESULT ══ */
+  #result {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .result-hero {
+    text-align: center;
+    padding: 48px 0 40px;
+    background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(192,132,252,0.15) 0%, transparent 70%);
+    border-radius: 20px;
+    margin-bottom: 32px;
+  }
+  .result-hero h2 {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #e2e8f0 20%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .result-hero p { color: var(--muted); font-size: 0.95rem; }
+
+  /* Result sections */
+  .result-grid { display: flex; flex-direction: column; gap: 16px; }
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+  .result-card:nth-child(1) { animation-delay: 0.05s; }
+  .result-card:nth-child(2) { animation-delay: 0.1s; }
+  .result-card:nth-child(3) { animation-delay: 0.15s; }
+  .result-card:nth-child(4) { animation-delay: 0.2s; }
+  .result-card:nth-child(5) { animation-delay: 0.25s; }
+  .result-card:nth-child(6) { animation-delay: 0.3s; }
+  .result-card:nth-child(7) { animation-delay: 0.35s; }
+  .result-card:nth-child(8) { animation-delay: 0.4s; }
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-accent, linear-gradient(90deg, var(--accent), var(--accent2)));
+  }
+  .rc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .rc-icon { font-size: 1.2rem; }
+  .rc-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .rc-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .rc-body { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+  .highlight {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .tag {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .tag-purple { background: rgba(192,132,252,0.15); color: var(--accent); }
+  .tag-pink { background: rgba(244,114,182,0.15); color: #f472b6; }
+  .tag-blue { background: rgba(96,165,250,0.15); color: var(--accent3); }
+  .tag-green { background: rgba(52,211,153,0.15); color: var(--green); }
+  .tag-yellow { background: rgba(251,191,36,0.15); color: var(--yellow); }
+  .tag-red { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+  /* Big partner type card */
+  .partner-type-card {
+    background: linear-gradient(135deg, rgba(192,132,252,0.1), rgba(244,114,182,0.08));
+    border: 1px solid rgba(192,132,252,0.3);
+    --card-accent: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .partner-type-name {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+  }
+
+  /* Retry button */
+  .retry-row {
+    text-align: center;
+    margin-top: 40px;
+  }
+  .retry-btn {
+    padding: 13px 36px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    background: transparent;
+    transition: all 0.2s;
+  }
+  .retry-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Prompt box in result */
+  .prompt-callout {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: #c4b5fd;
+    line-height: 1.7;
+    margin-top: 12px;
+    position: relative;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .copy-small {
+    position: absolute;
+    top: 10px; right: 10px;
+    padding: 4px 12px;
+    background: rgba(192,132,252,0.2);
+    border: 1px solid rgba(192,132,252,0.4);
+    border-radius: 6px;
+    color: var(--accent);
+    font-size: 0.72rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .copy-small.copied { background: rgba(52,211,153,0.2); border-color: var(--green); color: var(--green); }
+
+  @media (max-width: 600px) {
+    .result-card { padding: 20px 18px; }
+    .q-text { font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ SCREEN 1: INTRO ══ -->
+<div id="intro" class="screen active">
+  <div class="badge">AI × 親密關係心理學</div>
+  <h1>天選伴侶算法</h1>
+  <p class="subtitle">透過 10 個生活化問題，挖掘你的真實關係需求，產出專屬的天選伴侶說明書。</p>
+  <div class="intro-chips">
+    <div class="chip">🧠 10 道選擇題</div>
+    <div class="chip">⚡ 約 3 分鐘</div>
+    <div class="chip">📄 即時產出說明書</div>
+    <div class="chip">🔒 無需登入</div>
+  </div>
+  <button class="start-btn" onclick="startQuiz()">開始測驗</button>
+</div>
+
+<!-- ══ SCREEN 2: QUIZ ══ -->
+<div id="quiz" class="screen">
+  <div class="progress-bar-wrap">
+    <div class="progress-meta">
+      <span id="q-counter">第 1 題，共 10 題</span>
+      <span id="q-dim"></span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <div id="question-wrap" class="question-wrap">
+    <div class="q-dim-badge">
+      <span id="q-icon"></span>
+      <span id="q-dim-label"></span>
+    </div>
+    <div class="q-text" id="q-text"></div>
+    <div class="options" id="options-wrap"></div>
+    <div class="q-nav">
+      <button class="nav-btn" id="back-btn" onclick="prevQ()">← 上一題</button>
+      <button class="nav-btn primary" id="next-btn" onclick="nextQ()" disabled>下一題 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3: RESULT ══ -->
+<div id="result" class="screen">
+  <div class="result-hero">
+    <div class="badge" style="margin-bottom:16px">你的天選伴侶說明書</div>
+    <h2>關係需求畫像完成</h2>
+    <p>根據你的 10 個回答，以下是專屬於你的分析結果</p>
+  </div>
+  <div class="result-grid" id="result-grid"></div>
+  <div class="retry-row">
+    <button class="retry-btn" onclick="restart()">重新測驗</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────
+// QUESTIONS
+// ─────────────────────────────────────────
+const questions = [
+  {
+    dim: "舒適節奏與陪伴強度",
+    icon: "🌙",
+    text: "想像一個讓你感到「完全充足」的一天，你最理想的時間分配是什麼？",
+    opts: [
+      "大部分時間獨處，只在晚上有一段短暫的深度交流",
+      "上午各自做自己的事，下午到晚上一起活動",
+      "大部分時間都在一起，但各自有屬於自己的小角落",
+      "整天幾乎都在一起，隨時都能自然互動"
+    ]
+  },
+  {
+    dim: "分享慾與見證需求",
+    icon: "📣",
+    text: "當你達成了一個目標或遇到一件好事，你的第一反應是什麼？",
+    opts: [
+      "想立刻找同一個固定的人分享，不說出來就悶得慌",
+      "先自己消化感受，有機會再提給身邊的人",
+      "分享給幾個朋友，但不特別需要固定某一個人",
+      "發限時動態或社群，讓大家一起知道"
+    ]
+  },
+  {
+    dim: "壓力下的恢復方式",
+    icon: "⚡",
+    text: "當你處於高壓狀態（重大截止日、家庭壓力），你最需要的是？",
+    opts: [
+      "一個人獨處，安靜地整理自己的思緒",
+      "有人陪在旁邊，不需要說話也好，有個存在感就夠",
+      "有人主動傾聽，讓我把所有感受都說出來",
+      "有人幫我分析局勢，給出具體可行的建議"
+    ]
+  },
+  {
+    dim: "邊界與親密度的比率",
+    icon: "🚧",
+    text: "在一段穩定的關係中，你對哪種聯繫頻率感到最自在？",
+    opts: [
+      "每天有訊息聯繫，但不需要對方即時回覆",
+      "一天固定幾個時間點聯繫，其餘時間各自專注",
+      "隨時都可以找到彼此，高頻互動讓我有安全感",
+      "有需要或有話說再聯繫，不刻意維持每天的節奏"
+    ]
+  },
+  {
+    dim: "雷區與能量消耗點",
+    icon: "🔋",
+    text: "以下哪種相處情境最讓你感到精疲力竭？",
+    opts: [
+      "對方情緒起伏很大，我必須不斷猜測對方的狀態",
+      "對方黏著我，給我壓力要立刻回應或表態",
+      "對方習慣沉默，我要一直追問才知道發生了什麼",
+      "對方遇到問題總是找我，但自己不主動去解決"
+    ]
+  },
+  {
+    dim: "溝通與衝突修復機制",
+    icon: "💬",
+    text: "發生衝突或誤會後，你最希望事情以哪種方式推進？",
+    opts: [
+      "立刻把問題攤開來說清楚，不喜歡讓事情懸在那裡",
+      "先各自冷靜一段時間，再找一個好的時機好好談",
+      "希望對方先來哄我安撫情緒，等情緒平了再討論內容",
+      "讓我自己決定什麼時候準備好了再開口，不要催我"
+    ]
+  },
+  {
+    dim: "衝突後的冷靜期窗口",
+    icon: "⏱️",
+    text: "吵架或發生不愉快之後，你通常需要多久才能回到「可以好好溝通」的狀態？",
+    opts: [
+      "一小時以內，我處理情緒的速度很快",
+      "大概幾個小時到半天左右",
+      "至少要一天，需要睡一覺之後才能開口",
+      "需要幾天，我必須把整件事完全整理清楚才能談"
+    ]
+  },
+  {
+    dim: "風險偏好與安全感系統",
+    icon: "🎲",
+    text: "面對一個高風險高報酬的機會（換工作、移居海外、重大投資），你的第一反應是？",
+    opts: [
+      "先仔細評估最壞的情況，確認自己能承受後才考慮行動",
+      "蒐集足夠的資訊後，如果條件 OK 我願意冒險嘗試",
+      "挑戰感讓我心動，我傾向直接去試然後在過程中調整",
+      "先看伴侶的態度，我們需要在這件事上達成一致才行動"
+    ]
+  },
+  {
+    dim: "交叉驗證：需求衝突時",
+    icon: "⚖️",
+    text: "假設你正需要個人空間充電，但此時伴侶陷入情緒低谷需要你陪伴，你會怎麼做？",
+    opts: [
+      "放下自己的需要，先陪他／她度過難關，我的事之後再說",
+      "坦白告訴對方我現在也需要空間，一起想辦法找到平衡",
+      "盡量陪，但同時讓對方知道我的狀態，試著找個兩全其美",
+      "內心很糾結，這種兩難局面讓我壓力非常大"
+    ]
+  },
+  {
+    dim: "底線測試：最脆弱時的底線",
+    icon: "🛡️",
+    text: "如果你正處於人生低谷（失業、重病、重大失落），你最無法接受伴侶做的是？",
+    opts: [
+      "給我一大堆建議和分析，但完全不問我有什麼感受",
+      "告訴我「這沒什麼大不了」，試圖讓我快點想開",
+      "消失不見、不主動關心，讓我一個人撐著",
+      "催促我振作、不給我足夠的時間和空間去消化"
+    ]
+  }
+];
+
+// ─────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────
+let current = 0;
+const answers = new Array(10).fill(null);
+const customTexts = new Array(10).fill(''); // 儲存「其他」自填內容
+
+// ─────────────────────────────────────────
+// QUIZ FLOW
+// ─────────────────────────────────────────
+function startQuiz() {
+  showScreen('quiz');
+  renderQ(0);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderQ(idx) {
+  current = idx;
+  const q = questions[idx];
+  const total = questions.length;
+
+  // Progress
+  document.getElementById('q-counter').textContent = `第 ${idx + 1} 題，共 ${total} 題`;
+  document.getElementById('q-dim').textContent = q.dim;
+  document.getElementById('progress-fill').style.width = `${(idx / total) * 100}%`;
+
+  // Question
+  document.getElementById('q-icon').textContent = q.icon;
+  document.getElementById('q-dim-label').textContent = q.dim;
+  document.getElementById('q-text').textContent = q.text;
+
+  // Options
+  const wrap = document.getElementById('options-wrap');
+  wrap.innerHTML = '';
+  const keys = ['A', 'B', 'C', 'D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[idx] === i ? ' selected' : '');
+    btn.innerHTML = `<span class="opt-key">${keys[i]}</span><span class="opt-text">${opt}</span>`;
+    btn.onclick = () => selectOpt(i);
+    wrap.appendChild(btn);
+  });
+
+  // 其他（自填）option
+  const otherBtn = document.createElement('button');
+  const isOtherSelected = answers[idx] === 4;
+  otherBtn.className = 'option-btn other-btn' + (isOtherSelected ? ' selected' : '');
+  otherBtn.innerHTML = `<span class="opt-key">E</span><span class="opt-text">其他（自行填入）</span>`;
+  otherBtn.onclick = () => selectOpt(4);
+  wrap.appendChild(otherBtn);
+
+  // 自填文字框
+  const otherWrap = document.createElement('div');
+  otherWrap.className = 'other-input-wrap' + (isOtherSelected ? ' visible' : '');
+  otherWrap.id = 'other-input-wrap';
+  otherWrap.innerHTML = `
+    <textarea class="other-textarea" id="other-textarea"
+      placeholder="請填入你的想法或情況…"
+      maxlength="300"
+    >${customTexts[idx]}</textarea>
+    <div class="other-hint">此欄內容會顯示在你的說明書中，不影響算法分析。</div>
+  `;
+  wrap.appendChild(otherWrap);
+
+  // 監聽自填輸入
+  setTimeout(() => {
+    const ta = document.getElementById('other-textarea');
+    if (ta) ta.addEventListener('input', () => {
+      customTexts[current] = ta.value;
+    });
+  }, 0);
+
+  // Nav
+  document.getElementById('back-btn').disabled = idx === 0;
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.disabled = answers[idx] === null;
+  nextBtn.textContent = idx === total - 1 ? '查看結果 ✦' : '下一題 →';
+
+  // Re-animate
+  const qw = document.getElementById('question-wrap');
+  qw.style.animation = 'none';
+  qw.offsetHeight; // reflow
+  qw.style.animation = '';
+}
+
+function selectOpt(i) {
+  answers[current] = i;
+  document.querySelectorAll('.option-btn').forEach((b, idx) => {
+    b.classList.toggle('selected', idx === i);
+  });
+  // 顯示或隱藏自填框
+  const otherWrap = document.getElementById('other-input-wrap');
+  if (otherWrap) {
+    if (i === 4) {
+      otherWrap.classList.add('visible');
+      setTimeout(() => document.getElementById('other-textarea')?.focus(), 50);
+    } else {
+      otherWrap.classList.remove('visible');
+    }
+  }
+  document.getElementById('next-btn').disabled = false;
+}
+
+function nextQ() {
+  if (answers[current] === null) return;
+  if (current < questions.length - 1) {
+    renderQ(current + 1);
+  } else {
+    showResult();
+  }
+}
+
+function prevQ() {
+  if (current > 0) renderQ(current - 1);
+}
+
+function restart() {
+  answers.fill(null);
+  customTexts.fill('');
+  current = 0;
+  showScreen('intro');
+}
+
+// ─────────────────────────────────────────
+// RESULT ENGINE
+// ─────────────────────────────────────────
+function showResult() {
+  document.getElementById('progress-fill').style.width = '100%';
+  showScreen('result');
+
+  const a = answers; // [0-4] for Q1-Q10，4=其他（自填）
+
+  // 當選「其他」時，用中間值 fallback，避免分析偏移
+  const ind    = a[0] === 4 ? 2.5 : [4, 3, 2, 1][a[0]];
+  const freq1  = a[0] === 4 ? 2.5 : [1, 2, 3, 4][a[0]];
+  const share  = a[1] === 4 ? 2.5 : [4, 1, 2, 3][a[1]];
+  const recov  = a[2] === 4 ? 1   : a[2];    // 0=solo 1=presence 2=verbal 3=solution
+  const freq2  = a[3] === 4 ? 2.5 : [2, 2, 4, 1][a[3]];
+  const drain  = a[4] === 4 ? 'other' : ['unstable','clingy','passive','dependent'][a[4]];
+  const comm   = a[5] === 4 ? 'other' : ['direct','cooling','emotional','self-paced'][a[5]];
+  const win    = a[6] === 4 ? 1.5  : a[6];   // 0=short … 3=very long
+  const risk   = a[7] === 4 ? 1   : [0, 1, 2, 1][a[7]];
+  const aligned= a[7] === 3;
+  const q9     = a[8] === 4 ? 'other' : ['caregiver','assertive','balance','avoidant'][a[8]];
+  const coreNeed= a[9] === 4 ? 'other' : ['heard','accepted','present','space'][a[9]];
+
+  // 收集所有「其他」自填內容，最後在說明書附上
+  const customEntries = questions.map((q, i) =>
+    a[i] === 4 && customTexts[i].trim()
+      ? { dim: q.dim, icon: q.icon, text: customTexts[i].trim() }
+      : null
+  ).filter(Boolean);
+
+  const avgFreq = (freq1 + freq2) / 2;
+
+  // ── Partner type ──
+  let compScore = 0, simScore = 0;
+  if (drain === 'unstable') compScore += 2;
+  if (drain === 'dependent') compScore += 2;
+  if (drain === 'clingy') simScore += 2;
+  if (drain === 'passive') simScore += 2;
+  // 'other' → 不加分，保持中性
+  if (ind >= 3 && share >= 3) compScore += 1.5; // contradictory = needs complement
+  if (ind >= 3 && share <= 2) simScore += 1;    // both prefer space
+  if (ind <= 2 && share >= 3) simScore += 1;    // both prefer closeness
+  if (recov === 0 && coreNeed === 'present') compScore += 1; // solo recovery but needs presence
+  if (recov >= 2 && coreNeed === 'present') simScore += 0.5;
+  if (q9 === 'assertive') compScore += 0.5;
+  if (q9 === 'balance') { compScore += 0.5; simScore += 0.5; }
+
+  let partnerType, partnerEmoji, partnerDesc;
+  if (compScore > simScore + 0.5) {
+    partnerType = '互補型'; partnerEmoji = '🧲';
+    partnerDesc = '你在某些維度上有強烈需求，但這些需求和你的自然傾向相反——這代表你需要一個能「填補你盲區」的伴侶，而不是和你完全一樣的人。互補型伴侶能在你需要時主動補位，讓你不必時時刻刻解釋自己的狀態。';
+  } else if (simScore > compScore + 0.5) {
+    partnerType = '同類型'; partnerEmoji = '🔗';
+    partnerDesc = '你有清晰的相處風格與內在節奏，和一個「懂得用相似方式運轉」的人在一起，你們不需要太多解釋就能自然同步。同類型伴侶讓你不用持續消耗能量在「翻譯自己」，相處本身就是充電。';
+  } else {
+    partnerType = '平衡型'; partnerEmoji = '⚡';
+    partnerDesc = '你同時在不同面向上既需要空間又需要連結，這代表你適合一個高情商、能在互補與同類之間靈活切換的伴侶——能理解你的複雜性，而不是套用固定公式。';
+  }
+
+  // ── Rhythm ──
+  let rhythmTitle, rhythmDesc;
+  if (avgFreq >= 3.5) {
+    rhythmTitle = '高頻陪伴型';
+    rhythmDesc = '你在日常聯繫中獲得安全感，適合與你節奏同步、喜歡頻繁互動的伴侶。需要注意的是，確認對方的高頻來自「真實想靠近」而不是焦慮驅動。';
+  } else if (avgFreq >= 2.3) {
+    rhythmTitle = '中頻結構型';
+    rhythmDesc = '你需要穩定的聯繫節奏，但不需要全天候在線。固定的互動時間點讓你有安全感，同時也保留足夠的個人空間。適合有清晰作息與邊界感的伴侶。';
+  } else {
+    rhythmTitle = '低頻自主型';
+    rhythmDesc = '你在自己的節奏中運作最好，聯繫的質量遠比頻率重要。你適合同樣享受獨立生活、且不會因為「沒有主動聯繫」而解讀成冷漠的伴侶。';
+  }
+
+  // ── Communication ──
+  const commMap = {
+    'direct':     ['直接溝通型', '你在衝突中需要開門見山、直接把問題說清楚。避免選擇需要你「猜意思」或習慣拖延處理的伴侶，長期下來只會讓你更消耗。'],
+    'cooling':    ['緩衝後討論型', '你知道衝突中的情緒會影響溝通品質，所以需要先冷靜再談。理想的伴侶是能尊重你的節奏、不在你還沒準備好時強迫你立刻表態的人。'],
+    'emotional':  ['情緒優先型', '你的修復順序是：先被安撫，再討論內容。一個能識別你的情緒信號、知道先給你溫度再給你邏輯的伴侶，才能讓你真正感到被接住。'],
+    'self-paced': ['自主節奏型', '你需要在自己決定準備好後才能進入對話，而不是被催促。適合能給你足夠空間、且本身也具有耐心與安全感的伴侶，避免焦慮依附傾向的人。'],
+    'other':      ['混合溝通型', '你的溝通修復方式較為獨特，難以用單一標籤定義。你自填的描述顯示你對溝通有自己的節奏與條件——最重要的是找到能理解並尊重這套節奏的伴侶。']
+  };
+  const [commTitle, commDesc] = commMap[comm];
+
+  // ── Cooling window ──
+  const winTexts = [
+    ['短暫冷靜（1 小時內）', '你的情緒處理速度很快，能夠迅速進入有效溝通。注意選擇同樣願意「快速收尾」的伴侶，而不是需要幾天沉默期的人，否則你會在對方的冷靜期中感到被孤立。'],
+    ['中等冷靜期（數小時）', '幾小時的緩衝讓你能夠整理情緒並回到理性。這是一個很健康的冷靜窗口——確保伴侶知道這段時間是你的整理期，而不是逃避或冷戰的信號。'],
+    ['長冷靜期（一天）', '你需要睡一覺後才能真正沉澱，強迫自己在這之前溝通只會讓情況更糟。伴侶需要能接受這個節奏，且在你冷靜期間不會焦慮追問或解讀成你在懲罰他/她。'],
+    ['延長冷靜期（數天）', '你在完全整理清楚之前無法有效溝通，這不是逃避，而是你的認知處理方式。需要找一個本身也有很強自我安撫能力、不會在你沉默時崩潰或激化的伴侶。']
+  ];
+  const [winTitle, winDesc] = winTexts[win];
+
+  // ── Risk alignment ──
+  const riskMap = [
+    ['安全優先型', '你在重大決策中會先確認底線風險，安全感是你的基礎設施。理想伴侶應和你在財務保守度上相近，避免選擇衝動型或極度冒進的人，否則長期的財務分歧會成為關係的地雷。'],
+    ['理性評估型', '你不排斥冒險，但需要足夠的資訊和邏輯支撐才行動。你的伴侶不需要和你完全一致，但需要能和你一起「理性討論風險」而不是衝動或過度保守。'],
+    ['成長冒進型', '你的安全感來自「嘗試與成長」，而不是「穩定與保守」。你適合同樣有冒險基因的伴侶，或至少能接納你的風格、不因你的決策而產生嚴重焦慮的人。']
+  ];
+  const [riskTitle, riskDesc] = riskMap[risk];
+
+  // ── Drain warning ──
+  const drainMap = {
+    'unstable':  ['情緒穩定性', '情緒不穩定的伴侶會讓你長期消耗大量能量在「猜測對方狀態」上。你需要的是情緒成熟、內在穩定的人，而不是需要你不斷管理情緒的人。'],
+    'clingy':    ['獨立邊界感', '過度黏著和即時回應的壓力會讓你快速消耗殆盡。你需要的伴侶本身要有足夠的獨立生活與自我充實能力，不把你視為唯一的情緒出口。'],
+    'passive':   ['主動溝通力', '沉默不表達、需要你不斷追問的人會讓你精疲力竭。你需要一個能主動說出自己狀態、不讓你猜謎的伴侶，溝通流暢才是你的續命劑。'],
+    'dependent': ['自我效能感', '把所有問題都推給你解決的人會讓你感到窒息。你需要一個有能力處理自己生活問題、在關係中互為支撐而不是單向依賴的伴侶。'],
+    'other':     ['個人化雷區', '你的消耗點有自己的獨特情境，請參考你自填的描述。核心原則不變：找出讓你持續失去能量的相處模式，並明確告知未來的伴侶這條邊界。']
+  };
+  const [drainTitle, drainDesc] = drainMap[drain];
+
+  // ── Core need ──
+  const needMap = {
+    'heard':    ['被傾聽與理解', '你最深層的安全感來自「被真正聽見」，而不只是有人陪著。伴侶需要具備真正的傾聽能力，而不是急著給建議或讓你快點沒事。'],
+    'accepted': ['被接納與允許', '你最需要的是在脆弱時被完整接納，不被評判、不被催促「想開」。伴侶的包容力與情感智慧是你最在意的核心品質。'],
+    'present':  ['實體存在與陪伴', '在最低谷時，你需要的是對方「在場」的感覺，而不是分析或建議。伴侶需要能主動出現、不讓你孤軍奮戰的人。'],
+    'space':    ['被給予消化空間', '你最無法忍受的是在脆弱時被催促振作。伴侶需要具備耐心，能夠在你需要時退後一步，給你足夠的時間和空間而不是施壓。'],
+    'other':    ['個人化底線需求', '你在最脆弱時的底線有自己的獨特情境，請參考你自填的描述。這份個人化的需求值得被認真對待——未來的伴侶需要理解並尊重它。']
+  };
+  const [needTitle, needDesc] = needMap[coreNeed];
+
+  // ─── Build result cards ───
+  const cards = [
+    {
+      accent: 'linear-gradient(90deg,#c084fc,#f472b6)',
+      icon: partnerEmoji, label: '伴侶類型',
+      isBig: true,
+      title: partnerType,
+      body: partnerDesc,
+      tags: [
+        { text: partnerType, cls: 'tag-purple' },
+        { text: ind >= 3 ? '高獨立性' : '高陪伴需求', cls: ind >= 3 ? 'tag-blue' : 'tag-pink' },
+        { text: share >= 3 ? '高分享慾' : '內斂型', cls: share >= 3 ? 'tag-pink' : 'tag-blue' }
+      ]
+    },
+    {
+      accent: 'linear-gradient(90deg,#60a5fa,#38bdf8)',
+      icon: '🎵', label: '最佳相處節奏',
+      title: rhythmTitle,
+      body: rhythmDesc,
+      tags: [{ text: rhythmTitle, cls: 'tag-blue' }]
+    },
+    {
+      accent: 'linear-gradient(90deg,#34d399,#10b981)',
+      icon: '💬', label: '溝通與修復風格',
+      title: commTitle,
+      body: commDesc,
+      tags: [{ text: commTitle, cls: 'tag-green' }]
+    },
+    {
+      accent: 'linear-gradient(90deg,#a78bfa,#8b5cf6)',
+      icon: '⏱️', label: '衝突冷靜期設定',
+      title: winTitle,
+      body: winDesc,
+      tags: [{ text: winTitle, cls: 'tag-purple' }]
+    },
+    {
+      accent: 'linear-gradient(90deg,#fbbf24,#f59e0b)',
+      icon: '🎲', label: '風險與安全感對齊',
+      title: riskTitle,
+      body: riskDesc + (aligned ? ' 另外，你傾向先確認伴侶的態度再行動，這代表對齊彼此的風險觀是你關係的優先事項之一。' : ''),
+      tags: [{ text: riskTitle, cls: 'tag-yellow' }]
+    },
+    {
+      accent: 'linear-gradient(90deg,#ef4444,#f97316)',
+      icon: '⚠️', label: '高耗能雷區',
+      title: `最消耗你的是：缺乏${drainTitle}`,
+      body: drainDesc,
+      tags: [{ text: '避開雷區', cls: 'tag-red' }]
+    },
+    {
+      accent: 'linear-gradient(90deg,#f472b6,#e879f9)',
+      icon: '🛡️', label: '核心底線需求',
+      title: needTitle,
+      body: needDesc,
+      tags: [{ text: needTitle, cls: 'tag-pink' }]
+    },
+    ...(customEntries.length > 0 ? [{
+      accent: 'linear-gradient(90deg,#6ee7b7,#34d399)',
+      icon: '✏️', label: '你的自填內容',
+      title: '以下是你選擇「其他」時填入的描述',
+      body: '',
+      isCustom: true,
+      customEntries
+    }] : []),
+    {
+      accent: 'linear-gradient(90deg,#64748b,#94a3b8)',
+      icon: '📋', label: '進一步探索',
+      title: '用完整提示詞讓 AI 深度訪談你',
+      body: '以下提示詞可貼入 Claude 或 ChatGPT，進行動態的蘇格拉底式追問，獲得更細緻的說明書（AI 會根據你的回答即時調整第 9、10 題方向）：',
+      isPrompt: true
+    }
+  ];
+
+  const grid = document.getElementById('result-grid');
+  grid.innerHTML = '';
+
+  cards.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'result-card' + (c.isBig ? ' partner-type-card' : '');
+    div.style.setProperty('--card-accent', c.accent);
+
+    let tagsHtml = '';
+    if (c.tags) {
+      tagsHtml = `<div class="tag-row">${c.tags.map(t => `<span class="tag ${t.cls}">${t.text}</span>`).join('')}</div>`;
+    }
+
+    // 自填內容卡
+    let customHtml = '';
+    if (c.isCustom) {
+      customHtml = c.customEntries.map(e =>
+        `<div style="margin-top:12px;background:rgba(0,0,0,0.3);border:1px solid rgba(110,231,183,0.2);border-radius:10px;padding:14px 16px;">
+          <div style="font-size:0.75rem;font-weight:700;color:#6ee7b7;margin-bottom:6px;">${e.icon} ${e.dim}</div>
+          <div style="font-size:0.9rem;color:#e2e8f0;line-height:1.65;">${e.text}</div>
+        </div>`
+      ).join('');
+    }
+
+    let promptHtml = '';
+    if (c.isPrompt) {
+      promptHtml = `<div class="prompt-callout" id="prompt-callout">現在請你扮演一位資深親密關係與伴侶匹配諮詢師。你相信天選伴侶不是宿命論的對號入座，而是基於真實生活證據提煉出來的匹配模式，每個人都有一套可用、可遷移、可驗證的關係使用系統。
+
+請結合親密關係研究、衝突風格模型等 10 個經典的心理學和關係研究架構，使用「蘇格拉底式追問法」對我進行連續提問。
+
+規則：
+1. 不要一上來就給結論，請一次只問我一個問題，總共問 10 個生活化但具指向性的問題。
+2. 問題需要從不同角度交叉驗證（獨處/社交充電、消耗模式、壓力下的陪伴需求、溝通修復機制、風險偏好與安全感）。
+3. 在我回答完 10 個問題後，請給我一份具體可執行的「天選伴侶說明書」（包含適合互補還是同類伴侶、最佳相處節奏）。<button class="copy-small" id="copy-prompt-btn" onclick="copyPrompt()">複製</button></div>`;
+    }
+
+    div.innerHTML = `
+      <div class="rc-header">
+        <span class="rc-icon">${c.icon}</span>
+        <span class="rc-label">${c.label}</span>
+      </div>
+      ${c.isBig
+        ? `<div class="partner-type-name">${c.title}</div>`
+        : `<div class="rc-title">${c.title}</div>`
+      }
+      <div class="rc-body">${c.body}</div>
+      ${tagsHtml}
+      ${customHtml}
+      ${promptHtml}
+    `;
+    grid.appendChild(div);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyPrompt() {
+  const text = `現在請你扮演一位資深親密關係與伴侶匹配諮詢師。你相信天選伴侶不是宿命論的對號入座，而是基於真實生活證據提煉出來的匹配模式，每個人都有一套可用、可遷移、可驗證的關係使用系統。
+
+請結合親密關係研究、衝突風格模型等 10 個經典的心理學和關係研究架構，使用「蘇格拉底式追問法」對我進行連續提問。
+
+規則：
+1. 不要一上來就給結論，請一次只問我一個問題，總共問 10 個生活化但具指向性的問題。
+2. 問題需要從不同角度交叉驗證（獨處/社交充電、消耗模式、壓力下的陪伴需求、溝通修復機制、風險偏好與安全感）。
+3. 在我回答完 10 個問題後，請給我一份具體可執行的「天選伴侶說明書」（包含適合互補還是同類伴侶、最佳相處節奏）。`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-prompt-btn');
+    if (btn) { btn.textContent = '✓ 已複製'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 2500); }
+  });
+}
+</script>
+</body>
+</html>
