@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三觀檢測 — 世界觀 × 價值觀 × 人生觀 對照測驗</title>
+<meta name="description" content="14 題測出你的世界觀、價值觀、人生觀與磨合風格，產生對照碼邀請另一半或朋友作答，逐題對照彼此差異，附上專屬對話清單。三觀不必 100% 一致，重點是理解與尊重。">
+<meta property="og:title" content="三觀檢測 — 你們的三觀合不合？">
+<meta property="og:description" content="3 分鐘測出三觀畫像，再邀請另一半對照彼此差異。差異不是判決書，是聊天清單。">
+<style>
+  :root {
+    --bg: #0d0d14;
+    --surface: #16161f;
+    --card: #1e1e2e;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #f472b6;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #2d2d3f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ══ INTRO ══ */
+  #intro {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(56,189,248,0.16) 0%, transparent 70%);
+    position: relative;
+    overflow: hidden;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 14px;
+    background: rgba(56,189,248,0.14);
+    border: 1px solid rgba(56,189,248,0.35);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  #intro h1 {
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #e2e8f0 20%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  #intro .subtitle {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 560px;
+    margin: 0 auto 28px;
+    position: relative;
+  }
+  .intro-chips {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .chip {
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* 三觀說明卡 */
+  .sanguan-intro {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    max-width: 640px;
+    width: 100%;
+    margin: 0 auto 30px;
+    position: relative;
+  }
+  .sg-mini {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 14px;
+    text-align: left;
+  }
+  .sg-mini .sg-t { font-size: 0.95rem; font-weight: 800; margin-bottom: 4px; }
+  .sg-mini .sg-d { font-size: 0.78rem; color: var(--muted); line-height: 1.55; }
+
+  /* 夥伴邀請橫幅 */
+  .partner-banner {
+    display: none;
+    max-width: 560px;
+    width: 100%;
+    margin: 0 auto 24px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    background: rgba(244,114,182,0.12);
+    border: 1px solid rgba(244,114,182,0.4);
+    color: var(--accent3);
+    font-size: 0.92rem;
+    font-weight: 600;
+    position: relative;
+  }
+  .partner-banner.visible { display: block; }
+
+  /* 名字輸入 */
+  .name-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 26px;
+    position: relative;
+    flex-wrap: wrap;
+  }
+  .name-input {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+    width: 220px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .name-input:focus { border-color: var(--accent); }
+  .name-input::placeholder { color: var(--muted); }
+
+  .start-btn {
+    position: relative;
+    padding: 16px 48px;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    box-shadow: 0 6px 30px rgba(56,189,248,0.4);
+    transition: all 0.25s;
+    letter-spacing: 0.5px;
+  }
+  .start-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(56,189,248,0.55); }
+
+  /* 對照碼輸入 */
+  .code-zone {
+    margin-top: 26px;
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+  }
+  .code-toggle {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.88rem;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-family: inherit;
+  }
+  .code-toggle:hover { color: var(--accent); }
+  .code-input-row {
+    display: none;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .code-input-row.visible { display: flex; }
+  .code-input {
+    flex: 1;
+    min-width: 240px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: 'Courier New', monospace;
+    outline: none;
+  }
+  .code-input:focus { border-color: var(--accent); }
+  .code-load-btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: 1.5px solid var(--accent);
+    background: rgba(56,189,248,0.12);
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .code-load-btn:hover { background: rgba(56,189,248,0.22); }
+  .code-error {
+    display: none;
+    color: #ef4444;
+    font-size: 0.82rem;
+    margin-top: 8px;
+  }
+  .code-error.visible { display: block; }
+
+  .back-home {
+    margin-top: 34px;
+    position: relative;
+  }
+  .back-home a { color: var(--muted); font-size: 0.85rem; text-decoration: none; }
+  .back-home a:hover { color: var(--accent); }
+
+  /* ══ QUIZ ══ */
+  #quiz {
+    min-height: 100vh;
+    padding: 0 24px 60px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .progress-bar-wrap { padding: 28px 0 0; margin-bottom: 32px; }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .progress-track {
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+  .question-wrap { animation: fadeUp 0.35s ease both; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .q-dim-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba(56,189,248,0.1);
+    border: 1px solid rgba(56,189,248,0.25);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .q-text {
+    font-size: clamp(1.1rem, 3vw, 1.35rem);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .options { display: flex; flex-direction: column; gap: 12px; }
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 20px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.95rem;
+    color: var(--text);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    font-family: inherit;
+  }
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(129,140,248,0.05));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .option-btn:hover { border-color: var(--accent); transform: translateX(3px); }
+  .option-btn:hover::before { opacity: 1; }
+  .option-btn.selected {
+    border-color: var(--accent);
+    background: rgba(56,189,248,0.12);
+  }
+  .option-btn.selected .opt-key {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border-color: transparent;
+  }
+  .opt-key {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+  .opt-text { flex: 1; line-height: 1.55; }
+  .q-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    gap: 12px;
+  }
+  .nav-btn {
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    background: transparent;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .nav-btn:hover:not(:disabled) { border-color: var(--text); color: var(--text); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .nav-btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(56,189,248,0.3);
+  }
+  .nav-btn.primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(56,189,248,0.45); }
+  .nav-btn.primary:disabled { background: var(--border); box-shadow: none; color: var(--muted); }
+
+  /* ══ RESULT ══ */
+  #result, #compare {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .result-hero {
+    text-align: center;
+    padding: 48px 0 40px;
+    background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(56,189,248,0.14) 0%, transparent 70%);
+    border-radius: 20px;
+    margin-bottom: 32px;
+  }
+  .result-hero h2 {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #e2e8f0 20%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .result-hero p { color: var(--muted); font-size: 0.95rem; }
+
+  .result-grid { display: flex; flex-direction: column; gap: 16px; }
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+  .result-card:nth-child(1) { animation-delay: 0.05s; }
+  .result-card:nth-child(2) { animation-delay: 0.1s; }
+  .result-card:nth-child(3) { animation-delay: 0.15s; }
+  .result-card:nth-child(4) { animation-delay: 0.2s; }
+  .result-card:nth-child(5) { animation-delay: 0.25s; }
+  .result-card:nth-child(6) { animation-delay: 0.3s; }
+  .result-card:nth-child(7) { animation-delay: 0.35s; }
+  .result-card:nth-child(8) { animation-delay: 0.4s; }
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-accent, linear-gradient(90deg, var(--accent), var(--accent2)));
+  }
+  .rc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .rc-icon { font-size: 1.2rem; }
+  .rc-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .rc-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .rc-body { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .tag {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .tag-blue   { background: rgba(56,189,248,0.15); color: var(--accent); }
+  .tag-indigo { background: rgba(129,140,248,0.15); color: var(--accent2); }
+  .tag-pink   { background: rgba(244,114,182,0.15); color: var(--accent3); }
+  .tag-green  { background: rgba(52,211,153,0.15); color: var(--green); }
+  .tag-yellow { background: rgba(251,191,36,0.15); color: var(--yellow); }
+  .tag-red    { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+  .big-type-card {
+    background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(129,140,248,0.08));
+    border: 1px solid rgba(56,189,248,0.3);
+  }
+  .big-type-name {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+  }
+
+  /* 邀請對照卡 */
+  .invite-card {
+    background: linear-gradient(135deg, rgba(244,114,182,0.1), rgba(129,140,248,0.08));
+    border: 1px solid rgba(244,114,182,0.35);
+  }
+  .code-display {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    color: #93c5fd;
+    word-break: break-all;
+    margin: 12px 0;
+    line-height: 1.5;
+  }
+  .invite-btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .invite-btn {
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    border: 1.5px solid var(--accent3);
+    background: rgba(244,114,182,0.12);
+    color: var(--accent3);
+  }
+  .invite-btn:hover { background: rgba(244,114,182,0.22); transform: translateY(-2px); }
+  .invite-btn.alt {
+    border-color: var(--accent);
+    background: rgba(56,189,248,0.12);
+    color: var(--accent);
+  }
+  .invite-btn.alt:hover { background: rgba(56,189,248,0.22); }
+  .invite-btn.copied { border-color: var(--green); background: rgba(52,211,153,0.15); color: var(--green); }
+
+  /* ══ COMPARE ══ */
+  .vs-names {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 12px;
+    font-weight: 800;
+    font-size: 1.05rem;
+  }
+  .vs-names .vs-a { color: var(--accent); }
+  .vs-names .vs-b { color: var(--accent3); }
+  .vs-names .vs-x { color: var(--muted); font-size: 0.85rem; font-weight: 600; }
+
+  .match-pct {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+
+  .dim-bar-row { margin-bottom: 16px; }
+  .dim-bar-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.88rem;
+    margin-bottom: 6px;
+  }
+  .dim-bar-head .db-name { font-weight: 700; }
+  .dim-bar-head .db-pct { color: var(--muted); font-size: 0.8rem; }
+  .dim-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .dim-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .same-chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .same-chip {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: rgba(52,211,153,0.12);
+    border: 1px solid rgba(52,211,153,0.3);
+    color: var(--green);
+  }
+
+  .diff-item {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-top: 12px;
+  }
+  .diff-q {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .diff-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .diff-side {
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+  .diff-side.side-a { background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.25); }
+  .diff-side.side-b { background: rgba(244,114,182,0.08); border: 1px solid rgba(244,114,182,0.25); }
+  .diff-side .ds-name { font-weight: 800; font-size: 0.78rem; margin-bottom: 3px; }
+  .diff-side.side-a .ds-name { color: var(--accent); }
+  .diff-side.side-b .ds-name { color: var(--accent3); }
+  .diff-side .ds-short {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 999px;
+    margin-bottom: 4px;
+  }
+  .diff-side.side-a .ds-short { background: rgba(56,189,248,0.18); color: var(--accent); }
+  .diff-side.side-b .ds-short { background: rgba(244,114,182,0.18); color: var(--accent3); }
+  .diff-side .ds-opt { color: var(--muted); }
+  .diff-chat {
+    font-size: 0.82rem;
+    color: var(--yellow);
+    background: rgba(251,191,36,0.07);
+    border: 1px dashed rgba(251,191,36,0.35);
+    border-radius: 10px;
+    padding: 10px 12px;
+    line-height: 1.6;
+  }
+  .diff-level {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .diff-level.lv-near { background: rgba(251,191,36,0.15); color: var(--yellow); }
+  .diff-level.lv-far { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+  .retry-row { text-align: center; margin-top: 40px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .retry-btn {
+    padding: 13px 36px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    background: transparent;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .retry-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .result-card { padding: 20px 18px; }
+    .q-text { font-size: 1.05rem; }
+    .diff-pair { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ SCREEN 1: INTRO ══ -->
+<div id="intro" class="screen active">
+  <div class="badge">世界觀 × 價值觀 × 人生觀</div>
+  <h1>三觀檢測</h1>
+  <p class="subtitle">14 個生活情境，畫出你的三觀畫像。再邀請另一半或朋友作答，逐題對照彼此的差異——差異不是判決書，是聊天清單。</p>
+
+  <div id="partner-banner" class="partner-banner"></div>
+
+  <div class="sanguan-intro">
+    <div class="sg-mini">
+      <div class="sg-t">🌍 世界觀</div>
+      <div class="sg-d">你用什麼角度看世界：同一片巨浪，有人看到美，有人看到危險。</div>
+    </div>
+    <div class="sg-mini">
+      <div class="sg-t">⚖️ 價值觀</div>
+      <div class="sg-d">做決定時的優先順序與取捨：錢怎麼花、帳單怎麼分、工作為了什麼。</div>
+    </div>
+    <div class="sg-mini">
+      <div class="sg-t">🧭 人生觀</div>
+      <div class="sg-d">你追求什麼樣的人生：想要的生活模式、成功的定義、規劃的方式。</div>
+    </div>
+  </div>
+
+  <div class="intro-chips">
+    <div class="chip">📝 14 道情境題</div>
+    <div class="chip">⚡ 約 3 分鐘</div>
+    <div class="chip">💞 雙人差異對照</div>
+    <div class="chip">🔒 無需登入</div>
+  </div>
+
+  <div class="name-row">
+    <input class="name-input" id="name-input" type="text" maxlength="12" placeholder="你的名字或暱稱（選填）">
+  </div>
+  <button class="start-btn" onclick="startQuiz()">開始測驗</button>
+
+  <div class="code-zone">
+    <button class="code-toggle" id="code-toggle" onclick="toggleCodeInput()">收到對方的對照碼？點這裡輸入 →</button>
+    <div class="code-input-row" id="code-input-row">
+      <input class="code-input" id="code-input" type="text" placeholder="貼上對照碼或分享連結">
+      <button class="code-load-btn" onclick="loadCode()">載入</button>
+    </div>
+    <div class="code-error" id="code-error">這組對照碼無法解析，請確認有完整複製。</div>
+  </div>
+
+  <div class="back-home"><a href="index.html">← 回 3 分鐘測驗中心</a></div>
+</div>
+
+<!-- ══ SCREEN 2: QUIZ ══ -->
+<div id="quiz" class="screen">
+  <div class="progress-bar-wrap">
+    <div class="progress-meta">
+      <span id="q-counter">第 1 題，共 14 題</span>
+      <span id="q-dim"></span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <div id="question-wrap" class="question-wrap">
+    <div class="q-dim-badge">
+      <span id="q-icon"></span>
+      <span id="q-dim-label"></span>
+    </div>
+    <div class="q-text" id="q-text"></div>
+    <div class="options" id="options-wrap"></div>
+    <div class="q-nav">
+      <button class="nav-btn" id="back-btn" onclick="prevQ()">← 上一題</button>
+      <button class="nav-btn primary" id="next-btn" onclick="nextQ()" disabled>下一題 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3: SINGLE RESULT ══ -->
+<div id="result" class="screen">
+  <div class="result-hero">
+    <div class="badge" style="margin-bottom:16px">你的三觀畫像</div>
+    <h2 id="result-title">三觀畫像完成</h2>
+    <p>沒有標準答案，也沒有好壞——這是你看世界的方式</p>
+  </div>
+  <div class="result-grid" id="result-grid"></div>
+  <div class="retry-row">
+    <button class="retry-btn" onclick="restart()">重新測驗</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN 4: COMPARE RESULT ══ -->
+<div id="compare" class="screen">
+  <div class="result-hero">
+    <div class="badge" style="margin-bottom:16px">三觀對照結果</div>
+    <h2>你們的三觀合不合？</h2>
+    <div class="vs-names" id="vs-names"></div>
+  </div>
+  <div class="result-grid" id="compare-grid"></div>
+  <div class="retry-row">
+    <button class="retry-btn" onclick="restart()">重新測驗</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────
+// QUESTIONS
+// dim: 維度 / ordered: 選項是否為光譜（可算「接近」）
+// shorts: 每個選項的短標籤 / chat: 差異時的聊聊看提示
+// ─────────────────────────────────────────
+const questions = [
+  // ── 世界觀 ──
+  {
+    dim: '世界觀', icon: '🌊', ordered: true,
+    text: '看著一片海洋捲起巨浪，你心裡冒出的第一個念頭比較接近？',
+    opts: [
+      '太壯觀了！好想靠近一點感受那股力量',
+      '真美，不過在安全的地方欣賞就好',
+      '先看一下有沒有警示牌、會不會漲潮',
+      '太危險了，我們還是離遠一點吧'
+    ],
+    shorts: ['感受派', '欣賞派', '謹慎派', '安全派'],
+    chat: '同一片海，有人先看到美、有人先看到危險——聊聊你們的第一反應是從哪裡來的？跟小時候的經驗有關嗎？'
+  },
+  {
+    dim: '世界觀', icon: '🤝', ordered: true,
+    text: '你對「大部分的人」的預設看法是？',
+    opts: [
+      '人性本善，先信任再說',
+      '多數人是善意的，但要看情況',
+      '防人之心不可無，慢慢觀察',
+      '信任要靠長時間驗證，預設先保留'
+    ],
+    shorts: ['先信任', '偏信任', '偏謹慎', '先保留'],
+    chat: '聊聊彼此「信任人之後被回報」和「被辜負」的經驗——你們對人的預設值，是怎麼養成的？'
+  },
+  {
+    dim: '世界觀', icon: '🎲', ordered: true,
+    text: '你覺得一個人過得好不好，最關鍵的因素是？',
+    opts: [
+      '自己的努力與選擇',
+      '努力為主，時機運氣加分',
+      '環境與出身的影響很大',
+      '大部分要看運氣和大環境'
+    ],
+    shorts: ['努力決定', '努力為主', '環境影響', '時勢使然'],
+    chat: '這題會影響你們怎麼看待彼此的挫折與成功——聊聊各自人生中「努力有用」和「努力沒用」的時刻。'
+  },
+  {
+    dim: '世界觀', icon: '📰', ordered: true,
+    text: '你覺得這個世界整體而言正在？',
+    opts: [
+      '越來越好，文明持續在進步',
+      '有好有壞，但長期是向上的',
+      '問題越來越多，要步步為營',
+      '越來越糟，先把自己顧好'
+    ],
+    shorts: ['樂觀進步', '審慎樂觀', '審慎悲觀', '保守防禦'],
+    chat: '樂觀和悲觀沒有對錯，但會影響要不要生小孩、怎麼投資、怎麼過日子——聊聊你們對未來十年的想像。'
+  },
+  // ── 價值觀 ──
+  {
+    dim: '價值觀', icon: '💸', ordered: true,
+    text: '這個月意外多了一萬元，你會怎麼用？',
+    opts: [
+      '馬上安排一直想要的體驗或好物，錢就是要花',
+      '七成犒賞自己，三成存起來',
+      '三成犒賞自己，七成存起來',
+      '全部存起來或投資，錢要花在刀口上'
+    ],
+    shorts: ['及時行樂', '享受偏多', '儲蓄偏多', '精打細算'],
+    chat: '金錢觀是伴侶爭執排行榜的前三名。聊聊各自家裡怎麼用錢、你最有罪惡感和最有幸福感的一次消費。'
+  },
+  {
+    dim: '價值觀', icon: '🧾', ordered: true,
+    text: '你心中最自在的約會付錢方式是？',
+    opts: [
+      '各付各的，乾脆清楚',
+      '輪流請客，有來有往',
+      '收入高的人多出一點，量力而為',
+      '固定由一方請客，這是心意的表現'
+    ],
+    shorts: ['AA 制', '輪流請', '量力分擔', '一方請客'],
+    chat: '付錢方式的背後是「公平感」的定義——聊聊你們覺得怎樣算公平？是金額、心意，還是比例？'
+  },
+  {
+    dim: '價值觀', icon: '🛒', ordered: true,
+    text: '想買一個三千元左右的東西，你的典型流程是？',
+    opts: [
+      '預算內、看了喜歡就直接買，方便最重要',
+      '快速掃一下評價，沒問題就下單',
+      '比較幾家的規格與價格再決定',
+      '研究到透徹、等折扣，要買就買最划算的'
+    ],
+    shorts: ['直覺購', '快速確認', '比價型', '極致 CP'],
+    chat: '一個嫌麻煩、一個嫌浪費——這種小事每週都會出現。聊聊哪些東西值得花時間省錢、哪些不值得？'
+  },
+  {
+    dim: '價值觀', icon: '💼', ordered: false,
+    text: '如果薪水都一樣，你會選哪種工作？',
+    opts: [
+      '高挑戰高成長，累但進步很快',
+      '穩定有制度，生活規律準時下班',
+      '有意義、能幫助人，即使內容平凡',
+      '自由有彈性，自己掌握時間'
+    ],
+    shorts: ['挑戰成長', '穩定安心', '意義優先', '自由彈性'],
+    chat: '工作佔了人生三分之一——聊聊你們各自「為了什麼而工作」，以及能接受對方為工作犧牲生活到什麼程度。'
+  },
+  // ── 人生觀 ──
+  {
+    dim: '人生觀', icon: '🏝️', ordered: false,
+    text: '以下哪種人的生活最讓你嚮往？',
+    opts: [
+      '在大城市工作有成的高階主管',
+      '到處旅行、自由創作的內容創作者',
+      '有著幸福家庭、生活規律的人',
+      '生活悠閒、簡樸的小鎮民宿老闆'
+    ],
+    shorts: ['都會成就', '自由旅人', '幸福家庭', '簡單悠閒'],
+    chat: '想像十年後的某個平日早晨：你在哪裡醒來、接下來要做什麼——把畫面說給對方聽，看看兩個畫面合不合得起來。'
+  },
+  {
+    dim: '人生觀', icon: '🛋️', ordered: true,
+    text: '連假三天，你的理想安排是？',
+    opts: [
+      '完全宅在家，充電耍廢',
+      '大多在家，安排一天小出遊',
+      '市區活動、聚會、展覽排起來',
+      '直接出遠門旅行，越遠越好'
+    ],
+    shorts: ['全宅充電', '宅多動少', '動多宅少', '遠行模式'],
+    chat: '宅與外向只是興趣不合，硬要批評對方才是三觀不合。聊聊怎麼安排「一起的時間」和「各自的時間」。'
+  },
+  {
+    dim: '人生觀', icon: '🎯', ordered: false,
+    text: '對你來說，「人生過得成功」最接近哪一種？',
+    opts: [
+      '成就與影響力——做出被看見的事',
+      '體驗與自由——把世界活過一遍',
+      '關係與愛——身邊的人都幸福',
+      '平靜與安穩——無風無浪就是福'
+    ],
+    shorts: ['成就導向', '體驗導向', '關係導向', '安穩導向'],
+    chat: '這是人生觀的核心題。聊聊各自最敬佩的人是誰？為什麼是他？答案常常就是你心中成功的形狀。'
+  },
+  {
+    dim: '人生觀', icon: '⏳', ordered: true,
+    text: '你對「人生規劃」的態度是？',
+    opts: [
+      '有清楚的五年、十年計畫，照表前進',
+      '有大方向，細節邊走邊調',
+      '計畫趕不上變化，順勢而為',
+      '活在當下，未來的事未來再說'
+    ],
+    shorts: ['計畫導航', '方向感型', '順流而行', '活在當下'],
+    chat: '一個想訂計畫、一個想隨緣，常常不是不愛，是節奏不同。聊聊哪些大事需要一起規劃（買房？生養？），哪些可以隨性。'
+  },
+  // ── 磨合風格 ──
+  {
+    dim: '磨合風格', icon: '🐾', ordered: true,
+    text: '假設同居的另一半很想養寵物，但你會過敏，你會怎麼處理？',
+    opts: [
+      '明確說不行，健康問題沒得商量',
+      '用資料與感受說明嚴重性，希望對方主動放棄',
+      '一起找折衷：低敏品種、空氣清淨機、先短期試養',
+      '先讓對方養，我吃藥配合看看'
+    ],
+    shorts: ['直接表態', '說服溝通', '共議折衷', '配合退讓'],
+    chat: '磨合的關鍵不是誰贏，而是雙方都覺得被尊重。聊聊上一次你們意見不合，最後是怎麼收場的？兩個人都還舒服嗎？'
+  },
+  {
+    dim: '磨合風格', icon: '🏫', ordered: true,
+    text: '你想送小孩讀雙語幼兒園，對方覺得讀公立就好，你會？',
+    opts: [
+      '這件事我比較懂，強勢主導決定',
+      '想方設法用道理說服對方接受我的方案',
+      '列出兩案優缺點，一起討論後共同決定',
+      '表面上聽對方的，心裡保留自己的想法'
+    ],
+    shorts: ['強勢主導', '說服導向', '共議決策', '表面配合'],
+    chat: '教育觀是最容易「各自堅持都說為孩子好」的戰場。聊聊成長過程中，你們最感謝與最遺憾的教育安排是什麼？'
+  }
+];
+
+const DIMS = [
+  { name: '世界觀', icon: '🌍', idx: [0, 1, 2, 3] },
+  { name: '價值觀', icon: '⚖️', idx: [4, 5, 6, 7] },
+  { name: '人生觀', icon: '🧭', idx: [8, 9, 10, 11] },
+  { name: '磨合風格', icon: '🤝', idx: [12, 13] }
+];
+
+// ─────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+let myName = '';
+let partner = null; // { n: 名字, a: answers[] }
+
+// ─────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function encodeResult(n, a) {
+  const json = JSON.stringify({ n, a });
+  const bytes = new TextEncoder().encode(json);
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodeResult(code) {
+  try {
+    let b64 = code.trim().replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const bin = atob(b64);
+    const bytes = new Uint8Array([...bin].map(c => c.charCodeAt(0)));
+    const obj = JSON.parse(new TextDecoder().decode(bytes));
+    if (!obj || !Array.isArray(obj.a) || obj.a.length !== questions.length) return null;
+    if (!obj.a.every(v => Number.isInteger(v) && v >= 0 && v <= 3)) return null;
+    return { n: String(obj.n || '').slice(0, 12), a: obj.a };
+  } catch (e) { return null; }
+}
+function extractCode(input) {
+  const s = input.trim();
+  const m = s.match(/[?&]c=([A-Za-z0-9_-]+)/);
+  return m ? m[1] : s;
+}
+
+// ─────────────────────────────────────────
+// INTRO / CODE LOADING
+// ─────────────────────────────────────────
+function toggleCodeInput() {
+  document.getElementById('code-input-row').classList.toggle('visible');
+}
+function setPartner(p) {
+  partner = p;
+  const banner = document.getElementById('partner-banner');
+  banner.innerHTML = `💞 已載入 <b>${escapeHtml(p.n || '對方')}</b> 的作答。輪到你了——完成後就能看到你們的三觀對照結果！`;
+  banner.classList.add('visible');
+}
+function loadCode() {
+  const raw = document.getElementById('code-input').value;
+  const p = decodeResult(extractCode(raw));
+  const err = document.getElementById('code-error');
+  if (p) {
+    err.classList.remove('visible');
+    setPartner(p);
+    document.getElementById('code-input-row').classList.remove('visible');
+    document.getElementById('code-toggle').textContent = '✓ 對照碼已載入，可重新輸入 →';
+  } else {
+    err.classList.add('visible');
+  }
+}
+// 從網址 ?c= 自動載入
+(function initFromUrl() {
+  const m = location.search.match(/[?&]c=([A-Za-z0-9_-]+)/);
+  if (m) {
+    const p = decodeResult(m[1]);
+    if (p) setPartner(p);
+  }
+})();
+
+// ─────────────────────────────────────────
+// QUIZ FLOW
+// ─────────────────────────────────────────
+function startQuiz() {
+  myName = document.getElementById('name-input').value.trim().slice(0, 12);
+  showScreen('quiz');
+  renderQ(0);
+}
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0 });
+}
+function renderQ(idx) {
+  current = idx;
+  const q = questions[idx];
+  const total = questions.length;
+
+  document.getElementById('q-counter').textContent = `第 ${idx + 1} 題，共 ${total} 題`;
+  document.getElementById('q-dim').textContent = q.dim;
+  document.getElementById('progress-fill').style.width = `${(idx / total) * 100}%`;
+  document.getElementById('q-icon').textContent = q.icon;
+  document.getElementById('q-dim-label').textContent = q.dim;
+  document.getElementById('q-text').textContent = q.text;
+
+  const wrap = document.getElementById('options-wrap');
+  wrap.innerHTML = '';
+  const keys = ['A', 'B', 'C', 'D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[idx] === i ? ' selected' : '');
+    btn.innerHTML = `<span class="opt-key">${keys[i]}</span><span class="opt-text">${escapeHtml(opt)}</span>`;
+    btn.onclick = () => selectOpt(i);
+    wrap.appendChild(btn);
+  });
+
+  document.getElementById('back-btn').disabled = idx === 0;
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.disabled = answers[idx] === null;
+  nextBtn.textContent = idx === total - 1 ? '查看結果 ✦' : '下一題 →';
+
+  const qw = document.getElementById('question-wrap');
+  qw.style.animation = 'none';
+  qw.offsetHeight;
+  qw.style.animation = '';
+}
+function selectOpt(i) {
+  answers[current] = i;
+  document.querySelectorAll('.option-btn').forEach((b, idx) => {
+    b.classList.toggle('selected', idx === i);
+  });
+  document.getElementById('next-btn').disabled = false;
+}
+function nextQ() {
+  if (answers[current] === null) return;
+  if (current < questions.length - 1) {
+    renderQ(current + 1);
+  } else {
+    document.getElementById('progress-fill').style.width = '100%';
+    if (partner) {
+      showCompare({ n: myName, a: answers.slice() }, partner);
+    } else {
+      showResult();
+    }
+  }
+}
+function prevQ() {
+  if (current > 0) renderQ(current - 1);
+}
+function restart() {
+  answers = new Array(questions.length).fill(null);
+  current = 0;
+  partner = null;
+  document.getElementById('partner-banner').classList.remove('visible');
+  document.getElementById('code-toggle').textContent = '收到對方的對照碼？點這裡輸入 →';
+  history.replaceState(null, '', location.pathname);
+  showScreen('intro');
+}
+
+// ─────────────────────────────────────────
+// PORTRAIT（單人畫像）
+// ─────────────────────────────────────────
+function buildPortrait(a) {
+  const avg = idx => idx.reduce((s, i) => s + a[i], 0) / idx.length;
+
+  // 世界觀
+  const w = avg([0, 1, 2, 3]);
+  let world;
+  if (w < 1.1) world = ['開放感受派', '你傾向先看見世界的美與善意，相信事情會往好的方向走，也願意先給人信任。這讓你容易親近、充滿能量，但偶爾需要身邊有人幫你看路上的坑。'];
+  else if (w < 2.0) world = ['平衡觀察派', '你既能欣賞世界的美，也不會忽略它的風險。你對人對事保持「先觀察、再決定」的彈性，是很好的中間橋樑，能理解光譜兩端的人在想什麼。'];
+  else world = ['務實謹慎派', '你看世界的方式以安全與現實為座標，習慣先評估風險、再考慮浪漫。這讓你可靠、不容易踩雷，但記得偶爾允許自己「先感受、後分析」。'];
+
+  // 價值觀
+  const v = (a[4] + a[6]) / 2;
+  let values;
+  if (v < 1.1) values = ['體驗享受派', '對你來說，錢和時間是用來換取體驗與當下快樂的工具。你的消費直覺快、行動力強，重點是找到能一起享受、也能在大額決策上幫你踩煞車的隊友。'];
+  else if (v < 2.0) values = ['彈性平衡派', '你在「享受當下」與「精打細算」之間有自己的配速：該花的花、該省的省。這種彈性讓你和大多數金錢觀的人都能磨合，關鍵是把你的「該花/該省」標準說清楚。'];
+  else values = ['精算穩健派', '你重視資源的最佳配置，花錢前習慣比較與規劃，安全感來自存量與準備。和你相處的人需要理解：你的「省」不是小氣，是你愛自己與愛人的方式。'];
+
+  // 人生觀
+  const lifeTypes = [
+    ['成就導向', '你想做出被看見的事，成就感與影響力是你人生的主軸。你需要的是能欣賞你的野心、也能提醒你休息的人。'],
+    ['體驗導向', '你想把世界活過一遍，自由與新鮮感是你的氧氣。你需要的是能一起冒險、或至少不把你的流動當成不穩定的人。'],
+    ['關係導向', '你的成功定義是身邊的人都幸福，愛與連結是你人生的重心。你需要的是同樣願意把關係放在優先順位的人。'],
+    ['安穩導向', '你追求平靜與安穩的日子，無風無浪就是福。你需要的是能享受日常、不會嫌生活「太平淡」的人。']
+  ];
+  const life = lifeTypes[a[10]];
+
+  // 磨合風格
+  const collabCount = (a[12] === 2 ? 1 : 0) + (a[13] === 2 ? 1 : 0);
+  let fit;
+  if (collabCount === 2) fit = ['共議協商型', '遇到分歧時，你習慣把選項攤開來一起討論、共同決定。這是磨合裡最健康的肌肉——記得也給對方表達情緒的空間，不是每次都要立刻進入解題模式。'];
+  else if (collabCount === 1) fit = ['局部協商型', '你在某些情境願意共議折衷，某些情境則傾向堅持或退讓。留意一下：是哪些議題讓你不想商量？那通常就是你真正的底線所在。'];
+  else if (a[12] <= 1 && a[13] <= 1) fit = ['立場堅定型', '你在分歧中傾向先表態、用道理捍衛自己的判斷。立場清楚是優點，但記得文章裡的提醒：三觀不合的殺傷力，來自想「凌駕對方的觀念之上」。先聽完，再說服。'];
+  else if (a[12] === 3 && a[13] === 3) fit = ['退讓配合型', '你習慣以配合對方來維持和諧。溫柔是你的天賦，但長期單方面退讓會累積委屈——你的需求和對方的需求一樣重要，值得被說出來。'];
+  else fit = ['策略應對型', '你會視情境在堅持、說服、配合之間切換。彈性很好，但若常用「表面配合、心裡保留」，小心累積成未爆彈——真正的磨合需要把保留的想法說出口。'];
+
+  return { world, values, life, fit,
+    tags: {
+      money: questions[4].shorts[a[4]], bill: questions[5].shorts[a[5]],
+      shop: questions[6].shorts[a[6]], work: questions[7].shorts[a[7]],
+      dream: questions[8].shorts[a[8]], rest: questions[9].shorts[a[9]],
+      plan: questions[11].shorts[a[11]]
+    }
+  };
+}
+
+// ─────────────────────────────────────────
+// SINGLE RESULT
+// ─────────────────────────────────────────
+function showResult() {
+  showScreen('result');
+  const me = { n: myName, a: answers.slice() };
+  const p = buildPortrait(me.a);
+  const code = encodeResult(me.n, me.a);
+  const link = location.origin + location.pathname + '?c=' + code;
+
+  document.getElementById('result-title').textContent = (me.n ? me.n + ' 的' : '你的') + '三觀畫像完成';
+
+  const cards = [
+    {
+      accent: 'linear-gradient(90deg,#38bdf8,#818cf8)', icon: '🌍', label: '世界觀',
+      isBig: true, title: p.world[0], body: p.world[1],
+      tags: [
+        { text: questions[0].shorts[me.a[0]], cls: 'tag-blue' },
+        { text: questions[1].shorts[me.a[1]], cls: 'tag-blue' },
+        { text: questions[3].shorts[me.a[3]], cls: 'tag-indigo' }
+      ]
+    },
+    {
+      accent: 'linear-gradient(90deg,#fbbf24,#f59e0b)', icon: '⚖️', label: '價值觀',
+      title: p.values[0], body: p.values[1],
+      tags: [
+        { text: '金錢觀：' + p.tags.money, cls: 'tag-yellow' },
+        { text: '帳單觀：' + p.tags.bill, cls: 'tag-yellow' },
+        { text: '工作觀：' + p.tags.work, cls: 'tag-green' }
+      ]
+    },
+    {
+      accent: 'linear-gradient(90deg,#34d399,#10b981)', icon: '🧭', label: '人生觀',
+      title: p.life[0], body: p.life[1],
+      tags: [
+        { text: '嚮往：' + p.tags.dream, cls: 'tag-green' },
+        { text: '休假：' + p.tags.rest, cls: 'tag-green' },
+        { text: '規劃：' + p.tags.plan, cls: 'tag-blue' }
+      ]
+    },
+    {
+      accent: 'linear-gradient(90deg,#f472b6,#e879f9)', icon: '🤝', label: '磨合風格',
+      title: p.fit[0], body: p.fit[1],
+      tags: [{ text: p.fit[0], cls: 'tag-pink' }]
+    },
+    {
+      accent: 'linear-gradient(90deg,#f472b6,#818cf8)', icon: '💞', label: '雙人對照',
+      isInvite: true,
+      title: '邀請另一半（或朋友）來對照三觀',
+      body: '把下面的<b style="color:#f472b6">分享連結</b>傳給對方，對方作答完成後，就會直接看到你們 14 題的逐題差異對照＋專屬「聊聊看」對話清單。',
+      code, link
+    },
+    {
+      accent: 'linear-gradient(90deg,#64748b,#94a3b8)', icon: '📖', label: '溫柔提醒',
+      title: '三觀不合 ≠ 不適合',
+      body: '世界上不存在三觀 100% 一致的兩個人——就算親兄弟姐妹也不會一樣。真正的合拍，是<span style="color:#38bdf8;font-weight:700">即使不同，也能互相尊重、不批判、不強迫對方改變</span>。要警惕的只有兩種情況：想凌駕在你的觀念之上的人，以及違反基本道德底線（三觀不正）的人。'
+    }
+  ];
+
+  renderCards('result-grid', cards);
+}
+
+// ─────────────────────────────────────────
+// COMPARE RESULT
+// ─────────────────────────────────────────
+function matchPts(qi, x, y) {
+  if (x === y) return 2;
+  if (questions[qi].ordered && Math.abs(x - y) === 1) return 1;
+  return 0;
+}
+
+function showCompare(me, other) {
+  showScreen('compare');
+  const nameA = other.n || '對方';   // 先作答的人
+  const nameB = me.n || '我';        // 後作答的人
+
+  document.getElementById('vs-names').innerHTML =
+    `<span class="vs-a">${escapeHtml(nameA)}</span><span class="vs-x">×</span><span class="vs-b">${escapeHtml(nameB)}</span>`;
+
+  // 計分
+  const pts = questions.map((q, i) => matchPts(i, other.a[i], me.a[i]));
+  const totalPct = Math.round(pts.reduce((s, p) => s + p, 0) / (questions.length * 2) * 100);
+  const dimStats = DIMS.map(d => {
+    const got = d.idx.reduce((s, i) => s + pts[i], 0);
+    return { ...d, pct: Math.round(got / (d.idx.length * 2) * 100) };
+  });
+
+  // 總評（依文章精神：差異不是判決書）
+  let verdict, verdictBody;
+  if (totalPct >= 80) {
+    verdict = '高度共鳴 ✨';
+    verdictBody = '你們看世界的角度非常接近，相處起來大概常有「不用解釋就懂」的默契。記得別把默契當成理所當然——那少數幾題的差異，反而是最值得好奇的地方。';
+  } else if (totalPct >= 60) {
+    verdict = '同頻偏多 🎵';
+    verdictBody = '你們在多數面向上同頻，少數地方各有堅持。這是很健康的組合：夠像，相處不費力；夠不像，能互相打開新視野。下面的差異清單就是你們的進階話題。';
+  } else if (totalPct >= 40) {
+    verdict = '一半同頻、一半互補 🧲';
+    verdictBody = '你們有穩固的共同點，也有不少觀念上的碰撞。記住：三觀不合不等於不適合在一起——關鍵在於碰撞時，雙方能不能互相尊重、不批判、不強迫對方改變。下面每一題差異都附了聊天起手式。';
+  } else {
+    verdict = '差異豐富型 🌗';
+    verdictBody = '你們是兩個很不一樣的人。這不是判決書——差異多代表「自動同步」少，更需要刻意溝通與換位思考。如果你們都願意理解與尊重彼此的不同，差異反而能碰撞出別人沒有的火花；但如果有一方總想凌駕、改造對方，就要誠實面對了。';
+  }
+
+  // 一致 / 差異清單
+  const sameList = [], diffList = [];
+  questions.forEach((q, i) => {
+    if (pts[i] === 2) sameList.push({ q, i });
+    else diffList.push({ q, i, lv: pts[i] === 1 ? 'near' : 'far' });
+  });
+  diffList.sort((x, y) => (x.lv === 'far' ? 0 : 1) - (y.lv === 'far' ? 0 : 1));
+
+  const sameHtml = sameList.length
+    ? `<div class="same-chip-row">${sameList.map(({ q, i }) =>
+        `<span class="same-chip">${q.icon} ${escapeHtml(q.shorts[me.a[i]])}</span>`).join('')}</div>`
+    : '<div class="rc-body">這次沒有完全一致的題目——別緊張，往下看，重點是怎麼聊。</div>';
+
+  const diffHtml = diffList.length
+    ? diffList.map(({ q, i, lv }) => `
+      <div class="diff-item">
+        <div class="diff-q">${q.icon} ${escapeHtml(q.text)}
+          <span class="diff-level ${lv === 'far' ? 'lv-far' : 'lv-near'}">${lv === 'far' ? '明顯差異' : '略有不同'}</span>
+        </div>
+        <div class="diff-pair">
+          <div class="diff-side side-a">
+            <div class="ds-name">${escapeHtml(nameA)}</div>
+            <span class="ds-short">${escapeHtml(q.shorts[other.a[i]])}</span>
+            <div class="ds-opt">${escapeHtml(q.opts[other.a[i]])}</div>
+          </div>
+          <div class="diff-side side-b">
+            <div class="ds-name">${escapeHtml(nameB)}</div>
+            <span class="ds-short">${escapeHtml(q.shorts[me.a[i]])}</span>
+            <div class="ds-opt">${escapeHtml(q.opts[me.a[i]])}</div>
+          </div>
+        </div>
+        <div class="diff-chat">💬 聊聊看：${escapeHtml(q.chat)}</div>
+      </div>`).join('')
+    : '<div class="rc-body">14 題全部一致……你們確定不是同一個人？🤯</div>';
+
+  const barsHtml = dimStats.map(d => `
+    <div class="dim-bar-row">
+      <div class="dim-bar-head">
+        <span class="db-name">${d.icon} ${d.name}</span>
+        <span class="db-pct">${d.pct >= 75 ? '高度一致' : d.pct >= 45 ? '部分一致' : '明顯不同'} · ${d.pct}%</span>
+      </div>
+      <div class="dim-track"><div class="dim-fill" style="width:${d.pct}%"></div></div>
+    </div>`).join('');
+
+  const cards = [
+    {
+      accent: 'linear-gradient(90deg,#38bdf8,#f472b6)', icon: '💞', label: '整體同頻度',
+      isBig: true, title: verdict, body: verdictBody,
+      extra: `<div class="match-pct" style="margin-top:10px">${totalPct}%</div>`
+    },
+    {
+      accent: 'linear-gradient(90deg,#38bdf8,#818cf8)', icon: '📊', label: '四大維度對照',
+      title: '你們在哪些觀念上最接近？', body: '', extra: `<div style="margin-top:14px">${barsHtml}</div>`
+    },
+    {
+      accent: 'linear-gradient(90deg,#34d399,#10b981)', icon: '✅', label: '合拍清單',
+      title: `完全一致的有 ${sameList.length} 題`,
+      body: sameList.length ? '這些是你們不用磨合就同步的頻道：' : '',
+      extra: sameHtml
+    },
+    {
+      accent: 'linear-gradient(90deg,#fbbf24,#f59e0b)', icon: '🗺️', label: '差異地圖 × 對話清單',
+      title: `值得聊聊的有 ${diffList.length} 題`,
+      body: diffList.length ? '差異不是吵架的理由，是認識彼此的入口。每一題都附了一個聊天起手式：' : '',
+      extra: diffHtml
+    },
+    {
+      accent: 'linear-gradient(90deg,#64748b,#94a3b8)', icon: '📖', label: '溫柔提醒',
+      title: '三觀不合 ≠ 不適合，重點是尊重',
+      body: '不存在三觀 100% 一致的兩個人。所謂「三觀不合不適合在一起」，指的是：觀念碰撞時，有一方<span style="color:#ef4444;font-weight:700">不能給予理解與尊重，甚至想凌駕在對方的觀念之上、強迫對方改變</span>。只要能磨合出雙方都接受的相處方式、能換位思考，即使三觀沒有百分百合拍，依舊可以是一段很好的關係。'
+    }
+  ];
+
+  renderCards('compare-grid', cards);
+}
+
+// ─────────────────────────────────────────
+// CARD RENDERER & ACTIONS
+// ─────────────────────────────────────────
+function renderCards(gridId, cards) {
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+  cards.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'result-card' + (c.isBig ? ' big-type-card' : '') + (c.isInvite ? ' invite-card' : '');
+    div.style.setProperty('--card-accent', c.accent);
+
+    let tagsHtml = '';
+    if (c.tags) {
+      tagsHtml = `<div class="tag-row">${c.tags.map(t => `<span class="tag ${t.cls}">${escapeHtml(t.text)}</span>`).join('')}</div>`;
+    }
+
+    let inviteHtml = '';
+    if (c.isInvite) {
+      inviteHtml = `
+        <div class="code-display">${c.link}</div>
+        <div class="invite-btn-row">
+          <button class="invite-btn" data-copy="${escapeHtml(c.link)}" onclick="copyText(this, '✓ 已複製連結')">📋 複製分享連結</button>
+          <button class="invite-btn" data-copy="${escapeHtml(c.code)}" onclick="copyText(this, '✓ 已複製對照碼')">🔑 只複製對照碼</button>
+          <button class="invite-btn alt" onclick="startSecond()">📱 換對方在這台裝置接著測</button>
+        </div>`;
+    }
+
+    div.innerHTML = `
+      <div class="rc-header">
+        <span class="rc-icon">${c.icon}</span>
+        <span class="rc-label">${c.label}</span>
+      </div>
+      ${c.isBig ? `<div class="big-type-name">${c.title}</div>` : `<div class="rc-title">${c.title}</div>`}
+      <div class="rc-body">${c.body}</div>
+      ${c.extra || ''}
+      ${tagsHtml}
+      ${inviteHtml}
+    `;
+    grid.appendChild(div);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyText(btn, doneText) {
+  const text = btn.getAttribute('data-copy');
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = doneText;
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+// 同裝置接力：把目前結果存成 partner，重置題目給第二人作答
+function startSecond() {
+  partner = { n: myName || '第一位', a: answers.slice() };
+  answers = new Array(questions.length).fill(null);
+  current = 0;
+  const banner = document.getElementById('partner-banner');
+  banner.innerHTML = `💞 <b>${escapeHtml(partner.n)}</b> 已完成作答。請把裝置交給第二位，輸入名字後開始——完成後直接顯示對照結果！`;
+  banner.classList.add('visible');
+  document.getElementById('name-input').value = '';
+  showScreen('intro');
+}
+</script>
+</body>
+</html>
