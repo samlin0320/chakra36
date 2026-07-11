@@ -768,18 +768,24 @@ function setupGoogleAuth() {
   const warn = document.getElementById('gsi-warn');
   const dbg  = document.getElementById('origin-debug');
 
-  const origin = window.location.origin;
   const proto  = window.location.protocol;
   const isFile = proto === 'file:';
-  const isHttp = proto === 'http:' || proto === 'https:';
-  if (dbg) {
-    if (isFile) {
-      dbg.innerHTML = `❌ <b style="color:#f87171;">file:// 不支援 Google 登入</b><br>請改用：<a href="http://localhost:8080/chakra-36.html" style="color:#60a5fa;">http://localhost:8080/chakra-36.html</a>`;
-    } else if (isHttp) {
-      dbg.innerHTML = `🌐 目前 origin：<b style="color:#34d399;">${origin}</b><br>此 origin 必須登記在 Google Cloud Console 才能登入。`;
+  const LIVE_URL = 'https://questions.3minstest.com/chakra36.html';
+
+  if (isFile) {
+    // 本機檔案：Google 不允許 file:// 來源登入，導向線上版；本機仍可用訪客模式
+    if (dbg) {
+      dbg.style.display = 'block';
+      dbg.innerHTML = `📄 <b style="color:#fbbf24;">本機檔案預覽</b>　Google 登入需在網站上執行（file:// 無法使用）。<br>
+        👉 <a href="${LIVE_URL}" style="color:#60a5fa;">前往線上版登入 · questions.3minstest.com</a><br>
+        或直接用下方「<b>訪客模式</b>」在本機開始作答。`;
     }
+    wrap.style.display = 'none';
+    return;
   }
-  if (isFile) { wrap.style.display = 'none'; return; }
+
+  // 線上（http/https）：隱藏開發用的來源提示，一般使用者不需要看到
+  if (dbg) dbg.style.display = 'none';
 
   if (!GOOGLE_CLIENT_ID) { wrap.style.display = 'none'; warn.style.display = 'block'; return; }
   const init = () => {
