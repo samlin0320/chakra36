@@ -498,7 +498,7 @@
       <button type="button" class="mode-card" data-mode="advanced" id="mode-advanced">
         <div class="mode-emoji">🔮</div>
         <div class="mode-name">進階版</div>
-        <div class="mode-desc">每格 ≥ 13 字才算「正向回答 YES」，並統計「雙格共振」總題數。</div>
+        <div class="mode-desc">每格 ≥ 5 字才算「正向回答 YES」，並統計「雙格共振」總題數。</div>
       </button>
     </div>
   </div>
@@ -710,7 +710,7 @@ const QUESTIONS = [
   { n:36, chakra:'crown',  text:'說出一件你的個人問題，問對方該如何解決；也讓對方告訴你他眼中你的感受。', fields:[ ['WHAT','你的問題是什麼'], ['HOW','希望對方如何給回饋'] ] }
 ];
 
-const ADV_MIN_CHARS = 13;   // 進階版：每格需 ≥ 13 字才算「正向回答 YES」
+const ADV_MIN_CHARS = 5;    // 進階版：每格需 ≥ 5 字才算「正向回答 YES」
 const BASIC_MIN_CHARS = 1;  // 一般版：不限字數，有填（≥ 1 字）就算數
 const STORE_PREFIX = 'chakra36::';
 // 目前版本所需的最低字數（依 state.mode 動態切換）
@@ -721,7 +721,7 @@ function reqChars() { return state.mode === 'advanced' ? ADV_MIN_CHARS : BASIC_M
    ══════════════════════════════════════════════════════════════ */
 const state = {
   user: null,         // { email, name, provider }
-  mode: 'basic',      // 'basic'（一般版·不限字數） | 'advanced'（進階版·13字）
+  mode: 'basic',      // 'basic'（一般版·不限字數） | 'advanced'（進階版·5字）
   index: 0,           // current question
   answers: {},        // { [qNum]: { [fieldKey]: text } }
 };
@@ -836,7 +836,7 @@ document.getElementById('btn-back-app').addEventListener('click', () => show('ap
 
 /* ══════════════════════════════════════════════════════════════
    CHAKRA SCORING
-   每填寫一個 ≥13 字的欄位 → 該脈輪 +1 score
+   每填寫一個達標欄位（門檻依版本：進階 ≥5 字 / 一般 ≥1 字） → 該脈輪 +1 score
    每題填 1 個欄位 → slow（spin=8s）
    每題填 2+ 欄位  → fast（spin=3s）
    完全沒填 → 不轉
@@ -1083,7 +1083,7 @@ function buildMarkdown() {
   const u = state.user || { name: '訪客', email: '' };
   const lines = [];
   const o = overallStats();
-  const modeLabel = state.mode === 'advanced' ? '進階版（每格 ≥ 13 字）' : '一般版（不限字數）';
+  const modeLabel = state.mode === 'advanced' ? `進階版（每格 ≥ ${ADV_MIN_CHARS} 字）` : '一般版（不限字數）';
   lines.push(`# 身心靈檢測 · 36問脈輪共振`);
   lines.push(``);
   lines.push(`> **${u.name}**（${u.email || '未登入'}）　·　${new Date().toLocaleString()}`);
