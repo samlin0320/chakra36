@@ -86,6 +86,51 @@
   .start-btn.secondary { background: transparent; border: 1.5px solid var(--border); color: var(--muted); box-shadow: none; }
   .start-btn.secondary:hover { color: var(--text); border-color: var(--accent); transform: none; }
 
+  /* ── MODE SELECT (intro) ── */
+  .mode-select { max-width: 460px; width: 100%; margin: 0 auto 18px; }
+  .mode-select-title { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .mode-grid { grid-template-columns: 1fr; } }
+  .mode-card {
+    text-align: left; cursor: pointer; font-family: inherit;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 16px 14px; transition: all 0.2s; color: var(--text);
+  }
+  .mode-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .mode-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1.5px var(--accent), 0 8px 24px -10px var(--accent);
+    background: linear-gradient(135deg, rgba(192,132,252,0.14), rgba(244,114,182,0.07));
+  }
+  .mode-emoji { font-size: 1.4rem; margin-bottom: 6px; }
+  .mode-name { font-size: 0.98rem; font-weight: 800; margin-bottom: 6px; }
+  .mode-card.active .mode-name { color: var(--accent); }
+  .mode-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+  .mode-badge {
+    display: inline-block; padding: 3px 11px; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 700; border: 1px solid var(--border);
+    color: var(--accent); background: rgba(192,132,252,0.12);
+  }
+
+  /* ── MODE STATS (panel / result) ── */
+  .mode-stats { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .mode-stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 12px; font-size: 0.76rem; color: var(--muted);
+  }
+  .mode-stat-row b { color: var(--accent); font-size: 1rem; font-weight: 800; }
+  .result-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px; margin-bottom: 28px;
+  }
+  .result-stat {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; text-align: center;
+  }
+  .result-stat .num { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
+  .result-stat .lbl { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
   /* ── APP HEADER ── */
   .app-header {
     position: sticky; top: 0; z-index: 50;
@@ -433,7 +478,7 @@
     <span class="chip">7 脈輪</span>
     <span class="chip">36 提問</span>
     <span class="chip">5W1H 深掘</span>
-    <span class="chip">每欄 13 字以上</span>
+    <span class="chip">一般版 / 進階版</span>
   </div>
   <a class="channel-link" href="https://t.me/sam00may" target="_blank" rel="noopener" style="margin-bottom:14px;">
     📡 加入頻道 · t.me/sam00may
@@ -442,8 +487,24 @@
     📚 瀏覽頻道精選文章 →
   </button>
 
+  <div class="mode-select" id="mode-select">
+    <div class="mode-select-title">① 選擇測驗版本</div>
+    <div class="mode-grid">
+      <button type="button" class="mode-card active" data-mode="basic" id="mode-basic">
+        <div class="mode-emoji">🌿</div>
+        <div class="mode-name">一般版</div>
+        <div class="mode-desc">不限字數，自由書寫。想寫多少都可以，有填就算數。</div>
+      </button>
+      <button type="button" class="mode-card" data-mode="advanced" id="mode-advanced">
+        <div class="mode-emoji">🔮</div>
+        <div class="mode-name">進階版</div>
+        <div class="mode-desc">每格 ≥ 13 字才算「正向回答 YES」，並統計「雙格共振」總題數。</div>
+      </button>
+    </div>
+  </div>
+
   <div class="login-card">
-    <h3>開始之前 · 登入紀錄</h3>
+    <h3>② 開始之前 · 登入紀錄</h3>
     <p class="login-hint">使用 Gmail 登入後，答案會以你的 email 為索引保存在本機（localStorage），方便日後回顧或繼續。</p>
     <div id="gsi-btn-wrap"></div>
     <div id="gsi-warn" style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;display:none;">
@@ -477,6 +538,7 @@
 <section id="app-screen" class="screen">
   <header class="app-header">
     <span class="app-title">身心靈檢測 · 36問</span>
+    <span class="mode-badge" id="mode-badge">—</span>
     <a class="channel-link" href="https://t.me/sam00may" target="_blank" rel="noopener">📡 t.me/sam00may</a>
     <span class="user-pill"><span class="dot"></span><span id="user-label">—</span></span>
     <button class="icon-btn" id="btn-logout">登出</button>
@@ -487,6 +549,7 @@
     <aside class="chakra-panel">
       <h4>脈輪共振 · 即時</h4>
       <div class="chakra-list" id="chakra-list"></div>
+      <div class="mode-stats" id="mode-stats"></div>
       <div style="margin-top:14px;font-size:0.72rem;color:var(--muted);line-height:1.5;">
         每題回答 1 個欄位 → 慢轉<br>
         回答 2+ 欄位 → 快轉（共振增強）
@@ -514,6 +577,7 @@
     <h2 id="result-title">36問完成 · 你的脈輪能量圖譜</h2>
     <p id="result-sub">以下是你 7 脈輪的共振強度。</p>
   </div>
+  <div class="result-stats" id="result-stats"></div>
   <div class="chakra-grid" id="chakra-grid"></div>
   <div class="answers-block">
     <h3>📜 你的 36 題回答</h3>
@@ -646,14 +710,18 @@ const QUESTIONS = [
   { n:36, chakra:'crown',  text:'說出一件你的個人問題，問對方該如何解決；也讓對方告訴你他眼中你的感受。', fields:[ ['WHAT','你的問題是什麼'], ['HOW','希望對方如何給回饋'] ] }
 ];
 
-const MIN_CHARS = 13;
+const ADV_MIN_CHARS = 13;   // 進階版：每格需 ≥ 13 字才算「正向回答 YES」
+const BASIC_MIN_CHARS = 1;  // 一般版：不限字數，有填（≥ 1 字）就算數
 const STORE_PREFIX = 'chakra36::';
+// 目前版本所需的最低字數（依 state.mode 動態切換）
+function reqChars() { return state.mode === 'advanced' ? ADV_MIN_CHARS : BASIC_MIN_CHARS; }
 
 /* ══════════════════════════════════════════════════════════════
    STATE
    ══════════════════════════════════════════════════════════════ */
 const state = {
   user: null,         // { email, name, provider }
+  mode: 'basic',      // 'basic'（一般版·不限字數） | 'advanced'（進階版·13字）
   index: 0,           // current question
   answers: {},        // { [qNum]: { [fieldKey]: text } }
 };
@@ -661,10 +729,10 @@ const state = {
 /* ══════════════════════════════════════════════════════════════
    STORAGE
    ══════════════════════════════════════════════════════════════ */
-const storeKey = () => STORE_PREFIX + (state.user?.email || 'guest');
+const storeKey = () => STORE_PREFIX + state.mode + '::' + (state.user?.email || 'guest');
 function save() {
   if (!state.user) return;
-  localStorage.setItem(storeKey(), JSON.stringify({ user: state.user, index: state.index, answers: state.answers, ts: Date.now() }));
+  localStorage.setItem(storeKey(), JSON.stringify({ user: state.user, mode: state.mode, index: state.index, answers: state.answers, ts: Date.now() }));
 }
 function load() {
   if (!state.user) return false;
@@ -727,10 +795,15 @@ function setupGoogleAuth() {
   };
   init();
 }
+function applyModeBadge() {
+  const badge = document.getElementById('mode-badge');
+  if (badge) badge.textContent = state.mode === 'advanced' ? '🔮 進階版' : '🌿 一般版';
+}
 function loginAs(user) {
   state.user = user;
   load();
   document.getElementById('user-label').textContent = user.name + ' · ' + user.email;
+  applyModeBadge();
   show('app-screen');
   if (state.index >= QUESTIONS.length) { renderResult(); show('result'); return; }
   renderChakraPanel();
@@ -770,7 +843,7 @@ function chakraStats() {
     stats[q.chakra].max += q.fields.length;
     const ans = state.answers[q.n] || {};
     let filled = 0;
-    q.fields.forEach(([k]) => { if ((ans[k] || '').trim().length >= MIN_CHARS) filled += 1; });
+    q.fields.forEach(([k]) => { if ((ans[k] || '').trim().length >= reqChars()) filled += 1; });
     stats[q.chakra].score += filled;
     if (filled >= 1) stats[q.chakra].filledQs += 1;
     if (filled >= 2) stats[q.chakra].fastQs += 1;
@@ -780,6 +853,41 @@ function chakraStats() {
     s.pct = s.max ? Math.round((s.score / s.max) * 100) : 0;
   });
   return stats;
+}
+
+/* 整體統計：
+   - twoBox：填滿「2 格以上」的題數（雙格共振總數）
+   - positives：達標欄位（正向回答 YES）總數
+   - answered：至少填 1 格的題數
+   - totalFields：全部可填欄位數 */
+function overallStats() {
+  let twoBox = 0, positives = 0, answered = 0, totalFields = 0;
+  QUESTIONS.forEach(q => {
+    const ans = state.answers[q.n] || {};
+    totalFields += q.fields.length;
+    const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= reqChars()).length;
+    positives += filled;
+    if (filled >= 1) answered += 1;
+    if (filled >= 2) twoBox += 1;
+  });
+  return { twoBox, positives, answered, totalFields, totalQs: QUESTIONS.length };
+}
+
+function renderModeStats() {
+  const host = document.getElementById('mode-stats');
+  if (!host) return;
+  const o = overallStats();
+  if (state.mode === 'advanced') {
+    host.innerHTML = `
+      <div class="mode-stat-row"><span>🔮 雙格共振題數</span><b>${o.twoBox} / ${o.totalQs}</b></div>
+      <div class="mode-stat-row"><span>✅ 正向回答（YES）</span><b>${o.positives} / ${o.totalFields}</b></div>
+      <div class="mode-stat-row" style="font-size:0.68rem;color:var(--muted);">達標門檻：每格 ≥ ${ADV_MIN_CHARS} 字</div>`;
+  } else {
+    host.innerHTML = `
+      <div class="mode-stat-row"><span>🌿 已作答題數</span><b>${o.answered} / ${o.totalQs}</b></div>
+      <div class="mode-stat-row"><span>📝 已填欄位</span><b>${o.positives} / ${o.totalFields}</b></div>
+      <div class="mode-stat-row" style="font-size:0.68rem;color:var(--muted);">一般版 · 不限字數</div>`;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -804,6 +912,7 @@ function renderChakraPanel() {
         </div>
       </div>`;
   }).join('');
+  renderModeStats();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -813,6 +922,8 @@ function renderQuestion() {
   const q = QUESTIONS[state.index];
   const ans = state.answers[q.n] || (state.answers[q.n] = {});
   const c = CHAKRAS[q.chakra];
+  const req = reqChars();
+  const isAdv = state.mode === 'advanced';
 
   document.getElementById('progress-text').textContent = `第 ${state.index + 1} / ${QUESTIONS.length} 題`;
   const pct = Math.round(((state.index) / QUESTIONS.length) * 100);
@@ -827,15 +938,20 @@ function renderQuestion() {
       </span>
       <div class="q-num">Q${q.n} / 36</div>
       <div class="q-text">${q.text}</div>
-      ${q.hint ? `<div class="q-hint">提示：${q.hint}　／　每欄位至少 ${MIN_CHARS} 字</div>` : `<div class="q-hint">每欄位至少 ${MIN_CHARS} 字（選 1 ~ 多個欄位回答）</div>`}
+      ${(() => {
+        const rule = isAdv ? `每欄位至少 ${req} 字` : `自由書寫、不限字數`;
+        return q.hint
+          ? `<div class="q-hint">提示：${q.hint}　／　${rule}（選 1 ~ 多個欄位回答）</div>`
+          : `<div class="q-hint">${rule}（選 1 ~ 多個欄位回答，至少填 1 個）</div>`;
+      })()}
       <div class="field-grid">
         ${q.fields.map(([k, ph], i) => `
           <div class="field" data-field="${k}">
             <div class="field-label">
               <span>${k}</span>
-              <span class="field-counter" data-counter="${k}">0 / ${MIN_CHARS}</span>
+              <span class="field-counter" data-counter="${k}">${isAdv ? `0 / ${req}` : '0 字'}</span>
             </div>
-            <textarea class="field-input" data-input="${k}" placeholder="${ph}（≥ ${MIN_CHARS} 字）">${(ans[k] || '').replace(/</g,'&lt;')}</textarea>
+            <textarea class="field-input" data-input="${k}" placeholder="${ph}${isAdv ? `（≥ ${req} 字）` : '（自由書寫）'}">${(ans[k] || '').replace(/</g,'&lt;')}</textarea>
           </div>
         `).join('')}
       </div>
@@ -856,9 +972,9 @@ function renderQuestion() {
       const val = ta.value;
       ans[k] = val;
       const len = val.trim().length;
-      counter.textContent = `${len} / ${MIN_CHARS}`;
-      counter.classList.toggle('ok', len >= MIN_CHARS);
-      fieldEl.classList.toggle('valid', len >= MIN_CHARS);
+      counter.textContent = isAdv ? `${len} / ${req}` : `${len} 字`;
+      counter.classList.toggle('ok', len >= req);
+      fieldEl.classList.toggle('valid', len >= req);
       updateFilledCount();
       renderChakraPanel();
       save();
@@ -874,7 +990,7 @@ function renderQuestion() {
 function updateFilledCount() {
   const q = QUESTIONS[state.index];
   const ans = state.answers[q.n] || {};
-  const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= MIN_CHARS).length;
+  const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= reqChars()).length;
   const el = document.getElementById('filled-count');
   if (el) el.textContent = filled;
 }
@@ -882,8 +998,8 @@ function updateFilledCount() {
 function goNext() {
   const q = QUESTIONS[state.index];
   const ans = state.answers[q.n] || {};
-  const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= MIN_CHARS).length;
-  if (filled === 0) { toast(`本題請至少填 1 個欄位（≥ ${MIN_CHARS} 字）`); return; }
+  const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= reqChars()).length;
+  if (filled === 0) { toast(state.mode === 'advanced' ? `本題請至少填 1 個欄位（≥ ${reqChars()} 字）` : '本題請至少填 1 個欄位'); return; }
   if (state.index < QUESTIONS.length - 1) {
     state.index += 1; save(); renderQuestion(); renderChakraPanel();
   } else {
@@ -896,6 +1012,21 @@ function goNext() {
    ══════════════════════════════════════════════════════════════ */
 function renderResult() {
   const stats = chakraStats();
+
+  const o = overallStats();
+  const rs = document.getElementById('result-stats');
+  if (rs) {
+    rs.innerHTML = state.mode === 'advanced'
+      ? `
+        <div class="result-stat"><div class="num">${o.twoBox}/${o.totalQs}</div><div class="lbl">🔮 雙格共振題數</div></div>
+        <div class="result-stat"><div class="num">${o.positives}/${o.totalFields}</div><div class="lbl">✅ 正向回答（YES · ≥${ADV_MIN_CHARS}字）</div></div>
+        <div class="result-stat"><div class="num">${o.answered}/${o.totalQs}</div><div class="lbl">📝 已作答題數</div></div>`
+      : `
+        <div class="result-stat"><div class="num">${o.answered}/${o.totalQs}</div><div class="lbl">🌿 已作答題數</div></div>
+        <div class="result-stat"><div class="num">${o.positives}/${o.totalFields}</div><div class="lbl">📝 已填欄位</div></div>
+        <div class="result-stat"><div class="num">不限</div><div class="lbl">✍️ 一般版 · 字數不限</div></div>`;
+  }
+
   const grid = document.getElementById('chakra-grid');
   grid.innerHTML = CHAKRA_ORDER.map(k => {
     const c = CHAKRAS[k]; const s = stats[k];
@@ -912,7 +1043,7 @@ function renderResult() {
   const list = document.getElementById('answers-list');
   list.innerHTML = QUESTIONS.map(q => {
     const ans = state.answers[q.n] || {};
-    const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= MIN_CHARS);
+    const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= reqChars());
     if (!filled.length) return '';
     return `
       <div class="answer-item">
@@ -945,11 +1076,28 @@ function buildMarkdown() {
   const stats = chakraStats();
   const u = state.user || { name: '訪客', email: '' };
   const lines = [];
+  const o = overallStats();
+  const modeLabel = state.mode === 'advanced' ? '進階版（每格 ≥ 13 字）' : '一般版（不限字數）';
   lines.push(`# 身心靈檢測 · 36問脈輪共振`);
   lines.push(``);
   lines.push(`> **${u.name}**（${u.email || '未登入'}）　·　${new Date().toLocaleString()}`);
+  lines.push(`> 版本：**${modeLabel}**`);
   lines.push(`> 📡 由 [t.me/sam00may](${CHANNEL_URL}) 製作分享`);
   lines.push(``);
+  if (state.mode === 'advanced') {
+    lines.push(`## 📊 作答統計`);
+    lines.push(``);
+    lines.push(`- 🔮 雙格共振題數：**${o.twoBox} / ${o.totalQs}**`);
+    lines.push(`- ✅ 正向回答（YES · ≥ ${ADV_MIN_CHARS} 字）：**${o.positives} / ${o.totalFields}**`);
+    lines.push(`- 📝 已作答題數：**${o.answered} / ${o.totalQs}**`);
+    lines.push(``);
+  } else {
+    lines.push(`## 📊 作答統計`);
+    lines.push(``);
+    lines.push(`- 🌿 已作答題數：**${o.answered} / ${o.totalQs}**`);
+    lines.push(`- 📝 已填欄位：**${o.positives} / ${o.totalFields}**`);
+    lines.push(``);
+  }
   lines.push(`## 🌈 脈輪能量圖譜`);
   lines.push(``);
   lines.push(`| 脈輪 | 中文 | 共振% | 已填欄位 | 已答題 |`);
@@ -963,7 +1111,7 @@ function buildMarkdown() {
   lines.push(``);
   QUESTIONS.forEach(q => {
     const ans = state.answers[q.n] || {};
-    const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= MIN_CHARS);
+    const filled = q.fields.filter(([k]) => (ans[k] || '').trim().length >= reqChars());
     if (!filled.length) return;
     lines.push(`### Q${q.n}．${q.text}`);
     lines.push(`> 對應脈輪：${CHAKRAS[q.chakra].cn} (${CHAKRAS[q.chakra].en})`);
@@ -1100,6 +1248,14 @@ document.getElementById('btn-pdf').addEventListener('click', exportPdf);
 document.getElementById('btn-json').addEventListener('click', exportJson);
 document.getElementById('btn-copy').addEventListener('click', copyToClipboard);
 document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ── 版本選擇（一般版 / 進階版） ── */
+document.querySelectorAll('.mode-card').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.mode = btn.dataset.mode;
+    document.querySelectorAll('.mode-card').forEach(b => b.classList.toggle('active', b.dataset.mode === state.mode));
+  });
+});
 
 setupGoogleAuth();
 </script>
